@@ -32,9 +32,17 @@
     }
   </script>
   <style>
-    body { background-color: #090D16; color: #F8FAFC; font-family: 'Inter', sans-serif; }
-    .glass-nav { background: rgba(9, 13, 22, 0.88); backdrop-filter: blur(14px); }
-    .card-surface { background-color: #111827; border: 1px solid #1F2937; }
+    body {
+      background-color: #090D16;
+      background-image:
+        radial-gradient(circle at 12% 8%, rgba(34, 211, 238, 0.06), transparent 28%),
+        radial-gradient(circle at 88% 18%, rgba(139, 92, 246, 0.07), transparent 32%);
+      color: #F8FAFC;
+      font-family: 'Inter', sans-serif;
+    }
+    .glass-nav { background: rgba(9, 13, 22, 0.9); backdrop-filter: blur(16px); }
+    .card-surface { background-color: #111827; border: 1px solid #1F2937; transition: border-color 0.2s, transform 0.2s; }
+    .card-hover:hover { border-color: rgba(34, 211, 238, 0.4); transform: translateY(-2px); }
     .ai-glow-card {
       background: linear-gradient(135deg, rgba(16, 23, 41, 0.98) 0%, rgba(30, 19, 64, 0.96) 52%, rgba(9, 36, 56, 0.98) 100%);
       border: 1px solid rgba(139, 92, 246, 0.5);
@@ -55,10 +63,15 @@
       border-color: #22D3EE;
       box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15);
     }
+    .input-error {
+      border-color: #F43F5E !important;
+      box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15) !important;
+    }
     .btn-cyan {
       background: linear-gradient(135deg, #22D3EE 0%, #06B6D4 100%);
       color: #041016;
       font-weight: 700;
+      box-shadow: 0 8px 20px -6px rgba(34, 211, 238, 0.45);
     }
     .btn-cyan:hover { filter: brightness(1.08); }
     .btn-violet {
@@ -78,6 +91,7 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
+  <!-- Iconografía SVG -->
   <svg class="hidden" aria-hidden="true">
     <symbol id="icon-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M12 3L4 7.5v9L12 21l8-4.5v-9L12 3z" />
@@ -114,16 +128,28 @@
       <path d="M21 12a9 9 0 1 1-2.64-6.36" />
       <path d="M21 3v6h-6" />
     </symbol>
-    <symbol id="icon-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3" />
-      <path d="M2 14h4M10 8h4M18 16h4" />
+    <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M20 6L9 17l-5-5" />
+    </symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="7" />
+      <path d="M21 21l-4.35-4.35" />
+    </symbol>
+    <symbol id="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="9" y="9" width="13" height="13" rx="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </symbol>
+    <symbol id="icon-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M5 12h14" />
+      <path d="M13 6l6 6-6 6" />
     </symbol>
   </svg>
 
+  <!-- Barra de Navegación -->
   <header class="glass-nav sticky top-0 z-40 border-b border-hakaBorder">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
       <button onclick="switchTab('inicio')" class="flex items-center gap-3 text-left group">
-        <div class="w-10 h-10 rounded-xl bg-cyan-400/15 border border-cyan-400/40 flex items-center justify-center text-cyan-300">
+        <div class="w-10 h-10 rounded-xl bg-cyan-400/15 border border-cyan-400/40 flex items-center justify-center text-cyan-300 group-hover:scale-105 transition">
           <svg class="w-5 h-5"><use href="#icon-brand" /></svg>
         </div>
         <div>
@@ -138,31 +164,38 @@
       </button>
 
       <nav class="flex items-center gap-1 sm:gap-2 bg-slate-900/90 p-1 rounded-xl border border-hakaBorder overflow-x-auto">
-        <button id="tab-inicio" onclick="switchTab('inicio')" class="nav-tab px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-cyan-300 bg-cyan-400/15">Conoce Haka</button>
-        <button id="tab-vacante" onclick="switchTab('vacante')" class="nav-tab px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white">La Vacante</button>
-        <button id="tab-postular" onclick="switchTab('postular')" class="nav-tab px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white">Postular</button>
-        <button id="tab-dashboard" onclick="switchTab('dashboard')" class="nav-tab px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white">RR. HH. & IA</button>
+        <button id="tab-inicio" onclick="switchTab('inicio')" class="nav-tab px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-cyan-300 bg-cyan-400/15 transition">Conoce Haka</button>
+        <button id="tab-vacante" onclick="switchTab('vacante')" class="nav-tab px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white transition">La Vacante</button>
+        <button id="tab-postular" onclick="switchTab('postular')" class="nav-tab px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white transition">Postular</button>
+        <button id="tab-dashboard" onclick="switchTab('dashboard')" class="nav-tab px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white transition">RR. HH. & IA</button>
       </nav>
 
       <div class="flex items-center gap-2">
         <span id="status-db" class="hidden md:inline-flex items-center gap-1.5 text-xs font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-hakaBorder text-slate-300">
-          <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Supabase
+          <span id="status-db-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+          <span id="status-db-text">Conectando...</span>
         </span>
-        <button onclick="openConfigModal()" class="px-3 py-1.5 rounded-lg text-xs font-mono bg-slate-900 hover:bg-slate-800 border border-hakaBorder text-cyan-300 inline-flex items-center gap-1.5">
-          <svg class="w-3.5 h-3.5"><use href="#icon-sliders" /></svg>
-          <span>Config</span>
+        <button onclick="switchTab('postular')" class="hidden sm:inline-flex btn-cyan px-3.5 py-1.5 rounded-lg text-xs items-center gap-1.5 transition">
+          <span>Postular Ahora</span>
+          <svg class="w-3.5 h-3.5"><use href="#icon-arrow-right" /></svg>
         </button>
       </div>
     </div>
   </header>
 
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8">
+    <!-- VISTA 1: CONOCE HAKA -->
     <section id="view-inicio" class="space-y-10">
       <div class="card-surface rounded-3xl overflow-hidden grid lg:grid-cols-12">
         <div class="lg:col-span-7 p-6 sm:p-10 flex flex-col justify-center space-y-5">
-          <span class="inline-flex items-center gap-2 w-fit text-xs font-mono uppercase tracking-wider px-3 py-1 rounded-full bg-cyan-400/10 text-cyan-300 border border-cyan-400/30">
-            <svg class="w-3.5 h-3.5"><use href="#icon-layers" /></svg> Convocatoria Abierta · Gestión Humana & DO
-          </span>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="inline-flex items-center gap-2 w-fit text-xs font-mono uppercase tracking-wider px-3 py-1 rounded-full bg-cyan-400/10 text-cyan-300 border border-cyan-400/30">
+              <svg class="w-3.5 h-3.5"><use href="#icon-layers" /></svg> Convocatoria Abierta · Gestión Humana & DO
+            </span>
+            <span class="inline-flex items-center gap-1.5 text-xs font-mono px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
+              Modalidad Presencial / Híbrida · El Alto / La Paz
+            </span>
+          </div>
           <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight text-white">
             Construimos lácteos de excelencia cuidando a quienes los hacen posibles en <span class="text-cyan-400">Haka</span>.
           </h1>
@@ -170,30 +203,60 @@
             En <strong class="text-white">Haka</strong> somos una empresa industrial dedicada a la producción y transformación de alimentos derivados lácteos. Creemos que la calidad del producto y la sostenibilidad del negocio nacen de entornos laborales saludables, decisiones basadas en datos y liderazgo humano.
           </p>
           <div class="flex flex-wrap gap-3 pt-2">
-            <button onclick="switchTab('postular')" class="btn-cyan px-6 py-3 rounded-xl text-sm sm:text-base transition">
-              Postular como Gestor de Experiencia Corporativa
+            <button onclick="switchTab('postular')" class="btn-cyan px-6 py-3 rounded-xl text-sm sm:text-base inline-flex items-center gap-2 transition">
+              <span>Postular como Gestor de Experiencia Corporativa</span>
+              <svg class="w-4 h-4"><use href="#icon-arrow-right" /></svg>
             </button>
             <button onclick="switchTab('vacante')" class="px-6 py-3 rounded-xl text-sm sm:text-base font-semibold bg-slate-800/90 hover:bg-slate-800 text-white border border-hakaBorder transition">
               Ver Análisis del Cargo
             </button>
+            <button onclick="switchTab('dashboard')" class="px-5 py-3 rounded-xl text-sm sm:text-base font-semibold bg-violet-500/15 hover:bg-violet-500/25 text-violet-200 border border-violet-400/40 inline-flex items-center gap-2 transition">
+              <svg class="w-4 h-4"><use href="#icon-spark" /></svg>
+              <span>Panel RR. HH. & IA</span>
+            </button>
           </div>
         </div>
-        <div class="lg:col-span-5 min-h-[280px] lg:min-h-[420px] relative bg-slate-900">
+        <div class="lg:col-span-5 min-h-[280px] lg:min-h-[430px] relative bg-slate-900">
           <img
             src="https://www.zwirnerequipment.com/wp-content/uploads/2020/07/bigstock-Interior-Of-Dairy-Factory-With-361376272-1.jpg"
             alt="Tanques de acero inoxidable y línea industrial de planta láctea"
             class="media-frame"
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-5">
-            <div class="text-xs font-mono text-slate-200 bg-slate-950/75 backdrop-blur px-3 py-1.5 rounded-lg border border-white/10">
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-transparent flex items-end p-5">
+            <div class="text-xs font-mono text-slate-200 bg-slate-950/80 backdrop-blur px-3.5 py-2 rounded-lg border border-white/10">
               Planta y Procesos · Inocuidad, Calidad y Cultura Haka
             </div>
           </div>
         </div>
       </div>
 
+      <!-- Indicadores Culturales -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="card-surface rounded-2xl p-5 border-l-4 border-l-cyan-400">
+          <div class="text-2xl sm:text-3xl font-extrabold font-mono text-white">100%</div>
+          <div class="text-xs font-mono text-cyan-300 uppercase mt-1">Evaluación Basada en Evidencia</div>
+          <p class="text-xs text-slate-400 mt-1">Selección objetiva mediante casos situacionales y People Analytics.</p>
+        </div>
+        <div class="card-surface rounded-2xl p-5 border-l-4 border-l-violet-400">
+          <div class="text-2xl sm:text-3xl font-extrabold font-mono text-white">4 Pilares</div>
+          <div class="text-xs font-mono text-violet-300 uppercase mt-1">Competencias Críticas EX</div>
+          <p class="text-xs text-slate-400 mt-1">Data-driven, empatía estructurada, visión holística e influencia.</p>
+        </div>
+        <div class="card-surface rounded-2xl p-5 border-l-4 border-l-emerald-400">
+          <div class="text-2xl sm:text-3xl font-extrabold font-mono text-white">360°</div>
+          <div class="text-xs font-mono text-emerald-300 uppercase mt-1">Ciclo del Colaborador</div>
+          <p class="text-xs text-slate-400 mt-1">Desde onboarding e integración hasta bienestar y desarrollo.</p>
+        </div>
+        <div class="card-surface rounded-2xl p-5 border-l-4 border-l-amber-400">
+          <div class="text-2xl sm:text-3xl font-extrabold font-mono text-white">ISO / BPM</div>
+          <div class="text-xs font-mono text-amber-300 uppercase mt-1">Estándar Industrial Lácteo</div>
+          <p class="text-xs text-slate-400 mt-1">Seguridad ocupacional y salud psicosocial en planta y oficina.</p>
+        </div>
+      </div>
+
+      <!-- Identidad Corporativa -->
       <div class="grid md:grid-cols-3 gap-6">
-        <div class="card-surface rounded-2xl overflow-hidden flex flex-col">
+        <div class="card-surface card-hover rounded-2xl overflow-hidden flex flex-col">
           <div class="h-44 bg-slate-900 overflow-hidden">
             <img
               src="https://yasmintrading.com/wp-content/uploads/2025/03/what-is-dairy-processing-1.jpg"
@@ -210,7 +273,7 @@
           </div>
         </div>
 
-        <div class="card-surface rounded-2xl overflow-hidden flex flex-col">
+        <div class="card-surface card-hover rounded-2xl overflow-hidden flex flex-col">
           <div class="h-44 bg-slate-900 overflow-hidden">
             <img
               src="https://img.magnific.com/premium-photo/diverse-team-collaboration-modern-office-business-meeting-with-technology_919294-13512.jpg?semt=ais_hybrid&w=740&q=80"
@@ -227,7 +290,7 @@
           </div>
         </div>
 
-        <div class="card-surface rounded-2xl overflow-hidden flex flex-col">
+        <div class="card-surface card-hover rounded-2xl overflow-hidden flex flex-col">
           <div class="h-44 bg-slate-900 overflow-hidden">
             <img
               src="https://cdn.dribbble.com/userupload/47284194/file/ffd9b1492dd88e15e287a3d438d1fc9e.png"
@@ -245,31 +308,38 @@
         </div>
       </div>
 
+      <!-- EVP -->
       <div class="space-y-4">
-        <h2 class="text-2xl font-bold text-white">Nuestra Propuesta de Valor al Colaborador (EVP)</h2>
+        <div class="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <span class="text-xs font-mono text-cyan-400 uppercase">Cultura Organizacional</span>
+            <h2 class="text-2xl font-bold text-white">Nuestra Propuesta de Valor al Colaborador (EVP)</h2>
+          </div>
+          <button onclick="switchTab('vacante')" class="text-xs font-mono text-cyan-300 hover:underline">Explorar requisitos del cargo →</button>
+        </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="card-surface rounded-2xl p-5 space-y-2">
+          <div class="card-surface card-hover rounded-2xl p-5 space-y-2.5">
             <div class="w-9 h-9 rounded-lg bg-cyan-400/10 border border-cyan-400/30 flex items-center justify-center text-cyan-300">
               <svg class="w-4 h-4"><use href="#icon-users" /></svg>
             </div>
             <h3 class="font-bold text-cyan-300 text-sm">Diseño Centrado en la Persona</h3>
             <p class="text-xs text-slate-300 leading-relaxed">Rediseñamos momentos clave (inducción, reconocimiento, crecimiento y salida) escuchando las necesidades reales del equipo.</p>
           </div>
-          <div class="card-surface rounded-2xl p-5 space-y-2">
+          <div class="card-surface card-hover rounded-2xl p-5 space-y-2.5">
             <div class="w-9 h-9 rounded-lg bg-cyan-400/10 border border-cyan-400/30 flex items-center justify-center text-cyan-300">
               <svg class="w-4 h-4"><use href="#icon-chart" /></svg>
             </div>
             <h3 class="font-bold text-cyan-300 text-sm">Enfoque Data-Driven</h3>
             <p class="text-xs text-slate-300 leading-relaxed">Integramos clima laboral, eNPS, rotación y riesgo psicosocial para priorizar acciones con impacto medible.</p>
           </div>
-          <div class="card-surface rounded-2xl p-5 space-y-2">
+          <div class="card-surface card-hover rounded-2xl p-5 space-y-2.5">
             <div class="w-9 h-9 rounded-lg bg-cyan-400/10 border border-cyan-400/30 flex items-center justify-center text-cyan-300">
               <svg class="w-4 h-4"><use href="#icon-shield" /></svg>
             </div>
             <h3 class="font-bold text-cyan-300 text-sm">Salud Mental Organizacional</h3>
             <p class="text-xs text-slate-300 leading-relaxed">Cuidamos la carga emocional, la prevención del desgaste y la contención saludable frente a los cambios.</p>
           </div>
-          <div class="card-surface rounded-2xl p-5 space-y-2">
+          <div class="card-surface card-hover rounded-2xl p-5 space-y-2.5">
             <div class="w-9 h-9 rounded-lg bg-cyan-400/10 border border-cyan-400/30 flex items-center justify-center text-cyan-300">
               <svg class="w-4 h-4"><use href="#icon-layers" /></svg>
             </div>
@@ -278,8 +348,42 @@
           </div>
         </div>
       </div>
+
+      <!-- Ruta de Selección -->
+      <div class="card-surface rounded-3xl p-6 sm:p-8 space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <span class="text-xs font-mono text-violet-300 uppercase">Transparencia en el Reclutamiento</span>
+            <h2 class="text-xl sm:text-2xl font-bold text-white mt-1">Etapas del Proceso de Selección en Haka</h2>
+          </div>
+          <button onclick="switchTab('postular')" class="btn-cyan px-5 py-2.5 rounded-xl text-xs sm:text-sm">Iniciar Etapa 1</button>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-slate-900/90 border border-hakaBorder rounded-2xl p-4 space-y-1.5">
+            <span class="text-xs font-mono text-cyan-400">ETAPA 01</span>
+            <h3 class="font-bold text-white text-sm">Postulación Estructurada</h3>
+            <p class="text-xs text-slate-400">Registro de perfil académico, experiencia EX y resolución de 2 casos situacionales reales.</p>
+          </div>
+          <div class="bg-slate-900/90 border border-hakaBorder rounded-2xl p-4 space-y-1.5">
+            <span class="text-xs font-mono text-violet-300">ETAPA 02</span>
+            <h3 class="font-bold text-white text-sm">Análisis IA por Competencias</h3>
+            <p class="text-xs text-slate-400">Evaluación multidimensional con Gemini Talent Engine y detección de alertas de riesgo.</p>
+          </div>
+          <div class="bg-slate-900/90 border border-hakaBorder rounded-2xl p-4 space-y-1.5">
+            <span class="text-xs font-mono text-emerald-300">ETAPA 03</span>
+            <h3 class="font-bold text-white text-sm">Entrevista Técnica & Caso EX</h3>
+            <p class="text-xs text-slate-400">Sustentación de propuesta de intervención de clima y retención ante Gestión Humana.</p>
+          </div>
+          <div class="bg-slate-900/90 border border-hakaBorder rounded-2xl p-4 space-y-1.5">
+            <span class="text-xs font-mono text-amber-300">ETAPA 04</span>
+            <h3 class="font-bold text-white text-sm">Oferta e Onboarding Haka</h3>
+            <p class="text-xs text-slate-400">Incorporación formal al equipo de Desarrollo Organizacional y recorrido por planta.</p>
+          </div>
+        </div>
+      </div>
     </section>
 
+    <!-- VISTA 2: LA VACANTE -->
     <section id="view-vacante" class="hidden space-y-8">
       <div class="card-surface rounded-3xl p-6 sm:p-8 space-y-6">
         <div class="flex flex-wrap items-start justify-between gap-4 border-b border-hakaBorder pb-6">
@@ -287,20 +391,26 @@
             <span class="text-xs font-mono text-cyan-400 uppercase">Ficha Técnica del Puesto · Haka</span>
             <h1 class="text-2xl sm:text-4xl font-extrabold text-white mt-1">Gestor de Experiencia Corporativa</h1>
             <p class="text-slate-400 text-sm mt-1">Employee Experience Manager · Gestión Humana / Desarrollo Organizacional</p>
+            <div class="flex flex-wrap gap-2 mt-3">
+              <span class="text-xs font-mono px-2.5 py-1 rounded-md bg-slate-900 border border-hakaBorder text-slate-300">Área: Gestión Humana</span>
+              <span class="text-xs font-mono px-2.5 py-1 rounded-md bg-slate-900 border border-hakaBorder text-slate-300">Nivel: Coordinación / Especialista Sr.</span>
+              <span class="text-xs font-mono px-2.5 py-1 rounded-md bg-slate-900 border border-hakaBorder text-cyan-300">Sede: Planta & Oficinas Haka</span>
+            </div>
           </div>
-          <button onclick="switchTab('postular')" class="btn-cyan px-5 py-2.5 rounded-xl text-sm">
-            Ir al Formulario de Postulación
+          <button onclick="switchTab('postular')" class="btn-cyan px-5 py-2.5 rounded-xl text-sm inline-flex items-center gap-2">
+            <span>Ir al Formulario de Postulación</span>
+            <svg class="w-4 h-4"><use href="#icon-arrow-right" /></svg>
           </button>
         </div>
 
         <div class="grid md:grid-cols-2 gap-6">
-          <div class="space-y-2">
+          <div class="bg-slate-900/60 border border-hakaBorder rounded-2xl p-5 space-y-2">
             <h2 class="font-bold text-white text-base">Propósito Sistémico</h2>
             <p class="text-sm text-slate-300 leading-relaxed">
               Transformar las interacciones de los colaboradores con Haka en experiencias positivas y sostenibles que impulsen el compromiso, la productividad y la salud mental organizacional.
             </p>
           </div>
-          <div class="space-y-2">
+          <div class="bg-slate-900/60 border border-hakaBorder rounded-2xl p-5 space-y-2">
             <h2 class="font-bold text-white text-base">Complejidad y Relación de Dependencia</h2>
             <p class="text-sm text-slate-300 leading-relaxed">
               Reporta a Dirección de Gestión Humana / Dirección General. Exige toma de decisiones de nivel elevado, análisis sistémico de causas raíz y articulación con jefaturas, colaboradores, comunicaciones y proveedores de bienestar/engagement.
@@ -331,42 +441,86 @@
         </div>
 
         <div class="space-y-3">
-          <h2 class="font-bold text-white text-lg">Competencias Críticas Evaluadas por el Sistema</h2>
+          <h2 class="font-bold text-white text-lg">Competencias Críticas y Ponderación de Evaluación IA</h2>
           <div class="grid sm:grid-cols-2 gap-4">
-            <div class="bg-slate-900/70 border border-hakaBorder rounded-xl p-4">
-              <h3 class="font-semibold text-cyan-300 text-sm">Capacidad de Análisis (Data-Driven)</h3>
-              <p class="text-xs text-slate-300 mt-1">Traduce percepciones cualitativas y métricas de rotación/eNPS en decisiones respaldadas por evidencia y ROI.</p>
+            <div class="bg-slate-900/70 border border-hakaBorder rounded-xl p-4 space-y-1.5">
+              <div class="flex items-center justify-between">
+                <h3 class="font-semibold text-cyan-300 text-sm">Capacidad de Análisis (Data-Driven)</h3>
+                <span class="text-xs font-mono px-2 py-0.5 rounded bg-cyan-400/10 text-cyan-300">Peso: 30%</span>
+              </div>
+              <p class="text-xs text-slate-300">Traduce percepciones cualitativas y métricas de rotación/eNPS en decisiones respaldadas por evidencia y ROI.</p>
             </div>
-            <div class="bg-slate-900/70 border border-hakaBorder rounded-xl p-4">
-              <h3 class="font-semibold text-cyan-300 text-sm">Empatía Estructurada</h3>
-              <p class="text-xs text-slate-300 mt-1">Conecta con las necesidades y malestares del colaborador con alta contención emocional y objetividad.</p>
+            <div class="bg-slate-900/70 border border-hakaBorder rounded-xl p-4 space-y-1.5">
+              <div class="flex items-center justify-between">
+                <h3 class="font-semibold text-cyan-300 text-sm">Empatía Estructurada</h3>
+                <span class="text-xs font-mono px-2 py-0.5 rounded bg-cyan-400/10 text-cyan-300">Peso: 25%</span>
+              </div>
+              <p class="text-xs text-slate-300">Conecta con las necesidades y malestares del colaborador con alta contención emocional y objetividad.</p>
             </div>
-            <div class="bg-slate-900/70 border border-hakaBorder rounded-xl p-4">
-              <h3 class="font-semibold text-cyan-300 text-sm">Visión Holística</h3>
-              <p class="text-xs text-slate-300 mt-1">Aborda causas estructurales de cultura, liderazgo y procesos en lugar de medidas aisladas o superficiales.</p>
+            <div class="bg-slate-900/70 border border-hakaBorder rounded-xl p-4 space-y-1.5">
+              <div class="flex items-center justify-between">
+                <h3 class="font-semibold text-cyan-300 text-sm">Visión Holística y Sistémica</h3>
+                <span class="text-xs font-mono px-2 py-0.5 rounded bg-cyan-400/10 text-cyan-300">Peso: 25%</span>
+              </div>
+              <p class="text-xs text-slate-300">Aborda causas estructurales de cultura, liderazgo y procesos en lugar de medidas aisladas o superficiales.</p>
             </div>
-            <div class="bg-slate-900/70 border border-hakaBorder rounded-xl p-4">
-              <h3 class="font-semibold text-cyan-300 text-sm">Liderazgo de Influencia</h3>
-              <p class="text-xs text-slate-300 mt-1">Persuade y asesora a mandos medios y directivos para sostener experiencias laborales saludables.</p>
+            <div class="bg-slate-900/70 border border-hakaBorder rounded-xl p-4 space-y-1.5">
+              <div class="flex items-center justify-between">
+                <h3 class="font-semibold text-cyan-300 text-sm">Liderazgo de Influencia</h3>
+                <span class="text-xs font-mono px-2 py-0.5 rounded bg-cyan-400/10 text-cyan-300">Peso: 20%</span>
+              </div>
+              <p class="text-xs text-slate-300">Persuade y asesora a mandos medios y directivos para sostener experiencias laborales saludables.</p>
             </div>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 pt-2">
+          <div class="bg-emerald-500/5 border border-emerald-500/25 rounded-2xl p-5 space-y-2">
+            <h3 class="font-bold text-emerald-300 text-sm font-mono uppercase">Perfil Deseado (Requisitos)</h3>
+            <ul class="text-xs text-slate-300 space-y-1.5 list-disc pl-4">
+              <li>Licenciatura en Psicología Organizacional, Ingeniería Industrial, Administración o Gestión de RR. HH.</li>
+              <li>Conocimiento práctico en indicadores de gestión humana (rotación, ausentismo, eNPS, clima).</li>
+              <li>Habilidad para diseñar encuestas, analizar datos y presentar planes de acción ejecutivos.</li>
+              <li>Sensibilidad humana combinada con rigor metodológico en prevención de riesgos psicosociales.</li>
+            </ul>
+          </div>
+          <div class="bg-rose-500/5 border border-rose-500/25 rounded-2xl p-5 space-y-2">
+            <h3 class="font-bold text-rose-300 text-sm font-mono uppercase">Alertas de Riesgo que Evalúa el Sistema</h3>
+            <ul class="text-xs text-slate-300 space-y-1.5 list-disc pl-4">
+              <li>Enfoque limitado únicamente a organización de fiestas o actividades recreativas sin impacto estructural.</li>
+              <li>Ausencia de métricas o incapacidad para medir el retorno de las intervenciones de bienestar.</li>
+              <li>Postura punitiva o falta de escucha activa frente a conflictos entre jefaturas y operarios.</li>
+            </ul>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- VISTA 3: POSTULAR -->
     <section id="view-postular" class="hidden max-w-4xl mx-auto space-y-6">
-      <div class="card-surface rounded-2xl p-6">
-        <div class="flex items-center justify-between gap-4 mb-3">
+      <div class="card-surface rounded-2xl p-6 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
             <span class="text-xs font-mono text-cyan-400 uppercase">Formulario de Reclutamiento · Haka</span>
             <h1 class="text-2xl font-bold text-white">Postulación — Gestor de Experiencia Corporativa</h1>
           </div>
-          <span id="progress-label" class="text-xs font-mono text-cyan-300">Sección 1 de 6</span>
+          <span id="progress-label" class="text-xs font-mono px-3 py-1 rounded-full bg-cyan-400/10 text-cyan-300 border border-cyan-400/30">Sección 1 de 6</span>
         </div>
         <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-          <div id="progress-bar" class="h-full bg-cyan-400 transition-all duration-300" style="width: 16.6%;"></div>
+          <div id="progress-bar" class="h-full bg-gradient-to-r from-cyan-400 to-violet-400 transition-all duration-300" style="width: 16.6%;"></div>
+        </div>
+        <!-- Indicadores clicables de pasos -->
+        <div class="grid grid-cols-6 gap-1.5 pt-1 text-[11px] font-mono text-center">
+          <button type="button" onclick="goToStep(1)" class="step-pill py-1 rounded bg-cyan-400/20 text-cyan-300 border border-cyan-400/40">1. Datos</button>
+          <button type="button" onclick="goToStep(2)" class="step-pill py-1 rounded bg-slate-900 text-slate-400 border border-hakaBorder">2. Perfil</button>
+          <button type="button" onclick="goToStep(3)" class="step-pill py-1 rounded bg-slate-900 text-slate-400 border border-hakaBorder">3. Estudio</button>
+          <button type="button" onclick="goToStep(4)" class="step-pill py-1 rounded bg-slate-900 text-slate-400 border border-hakaBorder">4. Exp. EX</button>
+          <button type="button" onclick="goToStep(5)" class="step-pill py-1 rounded bg-slate-900 text-slate-400 border border-hakaBorder">5. Casos</button>
+          <button type="button" onclick="goToStep(6)" class="step-pill py-1 rounded bg-slate-900 text-slate-400 border border-hakaBorder">6. Cierre</button>
         </div>
       </div>
+
+      <div id="step-validation-msg" class="hidden rounded-xl p-3.5 border border-rose-500/40 bg-rose-500/10 text-rose-200 text-xs font-medium"></div>
 
       <form id="form-postulacion" onsubmit="submitApplication(event)" class="space-y-6">
         <div class="form-step card-surface rounded-2xl p-6 space-y-4" data-step="1">
@@ -374,7 +528,12 @@
           <p class="text-sm text-slate-300 leading-relaxed">
             Bienvenido al proceso de selección de <strong class="text-white">Haka</strong>. La información proporcionada será utilizada exclusivamente para fines de evaluación y reclutamiento para el cargo de Gestor de Experiencia Corporativa (y fines de prueba piloto académica si aplica).
           </p>
-          <label class="flex items-start gap-3 p-4 rounded-xl bg-slate-900/80 border border-hakaBorder cursor-pointer">
+          <div class="bg-slate-900/70 border border-hakaBorder rounded-xl p-4 text-xs text-slate-400 space-y-1">
+            <p class="text-slate-200 font-semibold">Recomendaciones antes de iniciar:</p>
+            <p>• Tiempo estimado de llenado: 5 a 8 minutos.</p>
+            <p>• En la Sección 5 encontrarás 2 casos situacionales clave evaluados por nuestro sistema de análisis por competencias.</p>
+          </div>
+          <label class="flex items-start gap-3 p-4 rounded-xl bg-slate-900/80 border border-hakaBorder cursor-pointer hover:border-cyan-400/40 transition">
             <input type="checkbox" id="acepta_terminos" required class="mt-1 w-4 h-4 accent-cyan-400" />
             <span class="text-sm text-slate-200">
               Declaro que los datos consignados son verídicos y autorizo a Haka el tratamiento de mi información para el proceso de reclutamiento. *
@@ -486,16 +645,16 @@
             <div>
               <label class="block text-xs font-medium text-slate-300 mb-2">Herramientas y metodologías aplicadas (puedes marcar varias)</label>
               <div class="grid sm:grid-cols-2 gap-2 text-sm text-slate-200">
-                <label class="flex items-center gap-2 bg-slate-900/70 p-2.5 rounded-lg border border-hakaBorder">
+                <label class="flex items-center gap-2 bg-slate-900/70 p-2.5 rounded-lg border border-hakaBorder cursor-pointer">
                   <input type="checkbox" name="metodologias_ex" value="eNPS y Encuestas de Clima" class="accent-cyan-400" /> eNPS y Encuestas de Clima
                 </label>
-                <label class="flex items-center gap-2 bg-slate-900/70 p-2.5 rounded-lg border border-hakaBorder">
+                <label class="flex items-center gap-2 bg-slate-900/70 p-2.5 rounded-lg border border-hakaBorder cursor-pointer">
                   <input type="checkbox" name="metodologias_ex" value="Employee Journey Maps" class="accent-cyan-400" /> Employee Journey Maps
                 </label>
-                <label class="flex items-center gap-2 bg-slate-900/70 p-2.5 rounded-lg border border-hakaBorder">
+                <label class="flex items-center gap-2 bg-slate-900/70 p-2.5 rounded-lg border border-hakaBorder cursor-pointer">
                   <input type="checkbox" name="metodologias_ex" value="Evaluación de Riesgo Psicosocial" class="accent-cyan-400" /> Evaluación de Riesgo Psicosocial
                 </label>
-                <label class="flex items-center gap-2 bg-slate-900/70 p-2.5 rounded-lg border border-hakaBorder">
+                <label class="flex items-center gap-2 bg-slate-900/70 p-2.5 rounded-lg border border-hakaBorder cursor-pointer">
                   <input type="checkbox" name="metodologias_ex" value="People Analytics / Indicadores de Retención" class="accent-cyan-400" /> People Analytics / Retención
                 </label>
               </div>
@@ -508,19 +667,34 @@
           </div>
         </div>
 
-        <div class="form-step card-surface rounded-2xl p-6 space-y-4" data-step="5">
-          <h2 class="text-lg font-bold text-cyan-300">Sección 5 · Escenarios Situacionales del Puesto</h2>
-          <div>
-            <label class="block text-xs font-medium text-slate-300 mb-1">
-              1. Diagnóstico y Data-Driven: Ante un incremento de rotación o ausentismo en la empresa, ¿qué analizarías primero y qué indicadores usarías para medir el impacto de tu intervención? *
-            </label>
-            <textarea id="caso_rotacion_datadriven" rows="4" required class="input-field" placeholder="Explica tu enfoque analítico, variables/métricas y cómo demostrarías resultados..."></textarea>
+        <div class="form-step card-surface rounded-2xl p-6 space-y-5" data-step="5">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-bold text-cyan-300">Sección 5 · Escenarios Situacionales del Puesto</h2>
+            <span class="text-xs font-mono text-violet-300">Evaluación Técnica</span>
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-300 mb-1">
-              2. Empatía Estructurada e Influencia: Describe cómo abordarías la resistencia al cambio o tensión entre jefaturas y colaboradores manteniendo objetividad y contención. *
-            </label>
-            <textarea id="caso_liderazgo_contencion" rows="4" required class="input-field" placeholder="Comparte tu estrategia de acompañamiento, comunicación y trabajo con líderes..."></textarea>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-medium text-slate-300">
+                1. Diagnóstico y Data-Driven: Ante un incremento de rotación o ausentismo en la empresa, ¿qué analizarías primero y qué indicadores usarías para medir el impacto de tu intervención? *
+              </label>
+            </div>
+            <textarea id="caso_rotacion_datadriven" oninput="updateCharCount('caso_rotacion_datadriven', 'count-caso-1')" rows="4" required class="input-field" placeholder="Explica tu enfoque analítico, variables/métricas y cómo demostrarías resultados..."></textarea>
+            <div class="flex justify-between text-[11px] font-mono text-slate-400 mt-1">
+              <span>Sugerencia: incluye métricas concretas (ej. tasa de rotación, eNPS, ausentismo, ROI).</span>
+              <span id="count-caso-1">0 caracteres</span>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-medium text-slate-300">
+                2. Empatía Estructurada e Influencia: Describe cómo abordarías la resistencia al cambio o tensión entre jefaturas y colaboradores manteniendo objetividad y contención. *
+              </label>
+            </div>
+            <textarea id="caso_liderazgo_contencion" oninput="updateCharCount('caso_liderazgo_contencion', 'count-caso-2')" rows="4" required class="input-field" placeholder="Comparte tu estrategia de acompañamiento, comunicación y trabajo con líderes..."></textarea>
+            <div class="flex justify-between text-[11px] font-mono text-slate-400 mt-1">
+              <span>Sugerencia: detalla cómo equilibras la contención emocional con acuerdos operativos.</span>
+              <span id="count-caso-2">0 caracteres</span>
+            </div>
           </div>
         </div>
 
@@ -529,16 +703,16 @@
           <div>
             <label class="block text-xs font-medium text-slate-300 mb-2">Cursos, diplomados o certificaciones relevantes</label>
             <div class="grid sm:grid-cols-2 gap-2 text-sm text-slate-200">
-              <label class="flex items-center gap-2 bg-slate-900/70 p-2.5 rounded-lg border border-hakaBorder">
+              <label class="flex items-center gap-2 bg-slate-900/70 p-2.5 rounded-lg border border-hakaBorder cursor-pointer">
                 <input type="checkbox" name="certificaciones" value="Analítica de Personas (Excel / Power BI)" class="accent-cyan-400" /> Analítica de Personas (Excel / Power BI)
               </label>
-              <label class="flex items-center gap-2 bg-slate-900/70 p-2.5 rounded-lg border border-hakaBorder">
+              <label class="flex items-center gap-2 bg-slate-900/70 p-2.5 rounded-lg border border-hakaBorder cursor-pointer">
                 <input type="checkbox" name="certificaciones" value="Gestión del Cambio" class="accent-cyan-400" /> Gestión del Cambio
               </label>
-              <label class="flex items-center gap-2 bg-slate-900/70 p-2.5 rounded-lg border border-hakaBorder">
+              <label class="flex items-center gap-2 bg-slate-900/70 p-2.5 rounded-lg border border-hakaBorder cursor-pointer">
                 <input type="checkbox" name="certificaciones" value="Diseño de Experiencia (EX / Design Thinking)" class="accent-cyan-400" /> Diseño de Experiencia (EX / Design Thinking)
               </label>
-              <label class="flex items-center gap-2 bg-slate-900/70 p-2.5 rounded-lg border border-hakaBorder">
+              <label class="flex items-center gap-2 bg-slate-900/70 p-2.5 rounded-lg border border-hakaBorder cursor-pointer">
                 <input type="checkbox" name="certificaciones" value="Salud Mental y Riesgos Psicosociales" class="accent-cyan-400" /> Salud Mental y Riesgos Psicosociales
               </label>
             </div>
@@ -554,23 +728,26 @@
         </div>
 
         <div class="flex items-center justify-between gap-4">
-          <button type="button" id="btn-prev" onclick="changeStep(-1)" class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-white disabled:opacity-40" disabled>
-            Anterior
+          <button type="button" id="btn-prev" onclick="changeStep(-1)" class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-white disabled:opacity-40 transition" disabled>
+            ← Anterior
           </button>
           <div class="flex items-center gap-3">
-            <button type="button" id="btn-next" onclick="changeStep(1)" class="btn-cyan px-6 py-2.5 rounded-xl text-sm">
-              Siguiente Sección
+            <button type="button" id="btn-next" onclick="changeStep(1)" class="btn-cyan px-6 py-2.5 rounded-xl text-sm inline-flex items-center gap-1.5 transition">
+              <span>Siguiente Sección</span>
+              <svg class="w-4 h-4"><use href="#icon-arrow-right" /></svg>
             </button>
-            <button type="submit" id="btn-submit" class="hidden btn-cyan px-6 py-2.5 rounded-xl text-sm">
-              Enviar Postulación
+            <button type="submit" id="btn-submit" class="hidden btn-cyan px-6 py-2.5 rounded-xl text-sm inline-flex items-center gap-2 transition">
+              <svg class="w-4 h-4"><use href="#icon-check" /></svg>
+              <span>Enviar Postulación</span>
             </button>
           </div>
         </div>
       </form>
 
-      <div id="submit-alert" class="hidden card-surface rounded-2xl p-5 border border-emerald-500/40 bg-emerald-500/10 text-emerald-200 text-sm"></div>
+      <div id="submit-alert" class="hidden card-surface rounded-2xl p-5 border border-emerald-500/40 bg-emerald-500/10 text-emerald-200 text-sm space-y-3"></div>
     </section>
 
+    <!-- VISTA 4: DASHBOARD RR. HH. & IA -->
     <section id="view-dashboard" class="hidden space-y-6">
       <div class="ai-glow-card rounded-3xl overflow-hidden grid lg:grid-cols-12">
         <div class="lg:col-span-8 p-6 sm:p-8 flex flex-col justify-between space-y-5">
@@ -587,17 +764,17 @@
             </p>
           </div>
           <div class="flex flex-wrap gap-2.5">
-            <button onclick="loadCandidates()" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-slate-900/90 hover:bg-slate-800 text-white border border-white/15 inline-flex items-center gap-2">
+            <button onclick="loadCandidates()" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-slate-900/90 hover:bg-slate-800 text-white border border-white/15 inline-flex items-center gap-2 transition">
               <svg class="w-4 h-4"><use href="#icon-refresh" /></svg>
               <span>Actualizar Datos</span>
             </button>
-            <button onclick="exportCSV()" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-200 border border-emerald-400/40 inline-flex items-center gap-2">
+            <button onclick="exportCSV()" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-200 border border-emerald-400/40 inline-flex items-center gap-2 transition">
               <svg class="w-4 h-4"><use href="#icon-download" /></svg>
               <span>Exportar CSV (Piloto)</span>
             </button>
-            <button id="btn-eval-ai" onclick="evaluateAllWithGemini()" class="btn-violet px-6 py-2.5 rounded-xl text-xs sm:text-sm inline-flex items-center gap-2">
+            <button id="btn-eval-ai" onclick="evaluateCandidatesWithGemini()" class="btn-violet px-6 py-2.5 rounded-xl text-xs sm:text-sm inline-flex items-center gap-2 transition">
               <svg class="w-4 h-4"><use href="#icon-spark" /></svg>
-              <span>Evaluar Perfiles con Gemini IA</span>
+              <span>Evaluar Todos con Gemini IA</span>
             </button>
           </div>
         </div>
@@ -613,18 +790,22 @@
         </div>
       </div>
 
+      <!-- KPIs -->
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="card-surface rounded-2xl p-5">
           <div class="text-xs text-slate-400 font-mono uppercase">Postulantes Registrados</div>
           <div id="kpi-total" class="text-3xl font-extrabold font-mono text-white mt-1.5">0</div>
+          <div id="kpi-pendientes" class="text-xs text-slate-400 mt-1">0 pendientes de evaluación</div>
         </div>
         <div class="card-surface rounded-2xl p-5">
           <div class="text-xs text-slate-400 font-mono uppercase">Evaluados con Gemini IA</div>
           <div id="kpi-evaluados" class="text-3xl font-extrabold font-mono text-violet-300 mt-1.5">0</div>
+          <div id="kpi-optimos-count" class="text-xs text-emerald-300 mt-1">0 altamente óptimos</div>
         </div>
         <div class="card-surface rounded-2xl p-5">
           <div class="text-xs text-slate-400 font-mono uppercase">Promedio de Idoneidad</div>
           <div id="kpi-promedio" class="text-3xl font-extrabold font-mono text-cyan-300 mt-1.5">--</div>
+          <div class="text-xs text-slate-400 mt-1">Escala 0 a 100 pts</div>
         </div>
         <div class="ai-glow-card rounded-2xl p-5">
           <div class="text-xs text-emerald-300 font-mono uppercase font-semibold">Perfil Más Óptimo (IA)</div>
@@ -633,17 +814,48 @@
         </div>
       </div>
 
-      <div id="ai-executive-summary" class="hidden ai-glow-card rounded-2xl p-6 space-y-2.5">
-        <div class="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
+      <!-- Dictamen Ejecutivo -->
+      <div id="ai-executive-summary" class="hidden ai-glow-card rounded-2xl p-6 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
           <h2 class="text-sm font-bold text-cyan-300 font-mono uppercase inline-flex items-center gap-2">
             <svg class="w-4 h-4 text-violet-300"><use href="#icon-spark" /></svg>
             Dictamen Ejecutivo Gemini AI · Haka
           </h2>
-          <span class="text-xs text-slate-300">Ranking y recomendación de perfil óptimo</span>
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-slate-300">Ranking y recomendación de perfil óptimo</span>
+            <button onclick="copyExecutiveSummary()" class="text-xs font-mono px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-slate-800 text-cyan-300 border border-white/10 inline-flex items-center gap-1">
+              <svg class="w-3.5 h-3.5"><use href="#icon-copy" /></svg>
+              <span id="copy-dictamen-label">Copiar</span>
+            </button>
+          </div>
         </div>
         <p id="ai-executive-text" class="text-sm text-slate-100 leading-relaxed whitespace-pre-line"></p>
       </div>
 
+      <!-- Barra de búsqueda y filtros -->
+      <div class="card-surface rounded-2xl p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div class="relative flex-1">
+          <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"><use href="#icon-search" /></svg>
+          <input
+            type="text"
+            id="search-candidates"
+            oninput="renderDashboard()"
+            class="input-field pl-10"
+            placeholder="Buscar por nombre, carrera, universidad o zona..."
+          />
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="filter-clasificacion" onchange="renderDashboard()" class="input-field sm:w-56">
+            <option value="ALL">Todas las clasificaciones</option>
+            <option value="Altamente Óptimo">Altamente Óptimo</option>
+            <option value="Apto con Reserva">Apto con Reserva</option>
+            <option value="Riesgo Detectado">Riesgo Detectado</option>
+            <option value="SIN_EVALUAR">Sin evaluar</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tabla de Postulantes -->
       <div class="card-surface rounded-2xl overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-sm">
@@ -654,7 +866,7 @@
                 <th class="p-4">Experiencia / EX</th>
                 <th class="p-4">Puntaje IA</th>
                 <th class="p-4">Clasificación</th>
-                <th class="p-4">Detalle</th>
+                <th class="p-4 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody id="candidates-tbody" class="divide-y divide-hakaBorder">
@@ -664,102 +876,74 @@
         </div>
       </div>
 
-      <div id="candidate-detail-card" class="hidden card-surface rounded-2xl p-6 space-y-4 border border-cyan-400/30">
-        <div class="flex items-center justify-between">
-          <h3 id="detail-name" class="text-xl font-bold text-white"></h3>
-          <button onclick="document.getElementById('candidate-detail-card').classList.add('hidden')" class="text-xs text-slate-400 hover:text-white">Cerrar</button>
+      <!-- Ficha Detallada del Postulante -->
+      <div id="candidate-detail-card" class="hidden card-surface rounded-2xl p-6 space-y-5 border border-cyan-400/40">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-hakaBorder pb-4">
+          <div>
+            <span class="text-xs font-mono text-cyan-400 uppercase">Expediente Integral del Candidato</span>
+            <h3 id="detail-name" class="text-xl font-bold text-white mt-0.5"></h3>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="detail-eval-btn" class="btn-violet px-3.5 py-1.5 rounded-lg text-xs inline-flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5"><use href="#icon-spark" /></svg>
+              <span>Re-evaluar Perfil</span>
+            </button>
+            <button onclick="document.getElementById('candidate-detail-card').classList.add('hidden')" class="px-3 py-1.5 rounded-lg text-xs bg-slate-800 text-slate-300 hover:text-white">
+              Cerrar
+            </button>
+          </div>
         </div>
-        <div id="detail-body" class="grid md:grid-cols-2 gap-4 text-sm text-slate-300"></div>
+        <div id="detail-body" class="grid md:grid-cols-2 gap-5 text-sm text-slate-300"></div>
       </div>
     </section>
   </main>
 
-  <div id="config-modal" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
-    <div class="card-surface rounded-2xl max-w-lg w-full p-6 space-y-4">
-      <div class="flex items-center justify-between">
-        <h2 class="text-lg font-bold text-white">Configuración de Conexiones (Gemini & Supabase)</h2>
-        <button onclick="closeConfigModal()" class="text-slate-400 hover:text-white text-sm">Cerrar</button>
+  <!-- Footer Corporativo -->
+  <footer class="border-t border-hakaBorder bg-slate-950/60 mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-white">HAKA</span>
+        <span>· Industria de Alimentos Derivados Lácteos · Plataforma Talent AI</span>
       </div>
-      <div class="space-y-3 text-xs">
-        <div>
-          <label class="block text-slate-300 mb-1">Gemini API Key</label>
-          <input type="text" id="cfg-gemini-key" class="input-field font-mono" />
-        </div>
-        <div>
-          <label class="block text-slate-300 mb-1">Modelo Gemini</label>
-          <input type="text" id="cfg-gemini-model" class="input-field font-mono" />
-        </div>
-        <div>
-          <label class="block text-slate-300 mb-1">Supabase URL</label>
-          <input type="text" id="cfg-supabase-url" class="input-field font-mono" />
-        </div>
-        <div>
-          <label class="block text-slate-300 mb-1">Supabase Publishable Key</label>
-          <input type="text" id="cfg-supabase-key" class="input-field font-mono" />
-        </div>
-      </div>
-      <div class="flex justify-end gap-2 pt-2">
-        <button onclick="resetDefaultConfig()" class="px-4 py-2 rounded-xl text-xs bg-slate-800 text-slate-300">Restaurar por defecto</button>
-        <button onclick="saveConfig()" class="btn-cyan px-4 py-2 rounded-xl text-xs">Guardar Configuración</button>
+      <div class="flex items-center gap-4 font-mono">
+        <button onclick="switchTab('inicio')" class="hover:text-cyan-300 transition">Empresa</button>
+        <button onclick="switchTab('vacante')" class="hover:text-cyan-300 transition">Vacante</button>
+        <button onclick="switchTab('postular')" class="hover:text-cyan-300 transition">Postular</button>
+        <button onclick="switchTab('dashboard')" class="hover:text-cyan-300 transition">RR. HH.</button>
       </div>
     </div>
-  </div>
+  </footer>
 
   <script>
-    const STORAGE_KEY = "haka_talent_ai_config_v1";
-    let appConfig = loadConfig();
+    // Configuración integrada con clave API fija y respaldo desde config.js para Supabase
+    const HAKA_CONFIG = {
+      ...(window.HAKA_DEFAULT_CONFIG || {}),
+      geminiApiKey: "AQ.Ab8RN6JI-ORc6emWsM6TvXmNxxvA4aYBBKWF0ijLW_mmAydSvA",
+      geminiModel: (window.HAKA_DEFAULT_CONFIG && window.HAKA_DEFAULT_CONFIG.geminiModel) || "gemini-2.5-flash"
+    };
+
     let supabaseClient = null;
     let candidatesCache = [];
     let currentStep = 1;
     const totalSteps = 6;
 
-    function loadConfig() {
-      try {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-        return { ...window.HAKA_DEFAULT_CONFIG, ...(saved || {}) };
-      } catch {
-        return { ...window.HAKA_DEFAULT_CONFIG };
-      }
+    function updateDbBadge(connected, label) {
+      const dot = document.getElementById("status-db-dot");
+      const text = document.getElementById("status-db-text");
+      if (!dot || !text) return;
+      dot.className = connected
+        ? "w-2 h-2 rounded-full bg-emerald-400"
+        : "w-2 h-2 rounded-full bg-rose-400";
+      text.textContent = label;
     }
 
     function initSupabase() {
-      if (window.supabase && appConfig.supabaseUrl && appConfig.supabasePublishableKey) {
-        supabaseClient = window.supabase.createClient(appConfig.supabaseUrl, appConfig.supabasePublishableKey);
+      if (window.supabase && HAKA_CONFIG.supabaseUrl && HAKA_CONFIG.supabasePublishableKey) {
+        supabaseClient = window.supabase.createClient(HAKA_CONFIG.supabaseUrl, HAKA_CONFIG.supabasePublishableKey);
+        updateDbBadge(true, "Supabase Activo");
+      } else {
+        updateDbBadge(false, "Sin config.js");
       }
-    }
-
-    function openConfigModal() {
-      document.getElementById("cfg-gemini-key").value = appConfig.geminiApiKey || "";
-      document.getElementById("cfg-gemini-model").value = appConfig.geminiModel || "gemini-2.5-flash";
-      document.getElementById("cfg-supabase-url").value = appConfig.supabaseUrl || "";
-      document.getElementById("cfg-supabase-key").value = appConfig.supabasePublishableKey || "";
-      document.getElementById("config-modal").classList.remove("hidden");
-    }
-
-    function closeConfigModal() {
-      document.getElementById("config-modal").classList.add("hidden");
-    }
-
-    function saveConfig() {
-      appConfig = {
-        ...appConfig,
-        geminiApiKey: document.getElementById("cfg-gemini-key").value.trim(),
-        geminiModel: document.getElementById("cfg-gemini-model").value.trim() || "gemini-2.5-flash",
-        supabaseUrl: document.getElementById("cfg-supabase-url").value.trim(),
-        supabasePublishableKey: document.getElementById("cfg-supabase-key").value.trim(),
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(appConfig));
-      initSupabase();
-      closeConfigModal();
-      loadCandidates();
-    }
-
-    function resetDefaultConfig() {
-      localStorage.removeItem(STORAGE_KEY);
-      appConfig = { ...window.HAKA_DEFAULT_CONFIG };
-      initSupabase();
-      openConfigModal();
-      loadCandidates();
     }
 
     function switchTab(tabName) {
@@ -787,15 +971,63 @@
       document.getElementById("progress-label").textContent = `Sección ${currentStep} de ${totalSteps}`;
       document.getElementById("progress-bar").style.width = `${(currentStep / totalSteps) * 100}%`;
       document.getElementById("btn-prev").disabled = currentStep === 1;
+
+      document.querySelectorAll(".step-pill").forEach((pill, index) => {
+        const stepNum = index + 1;
+        if (stepNum === currentStep) {
+          pill.className = "step-pill py-1 rounded bg-cyan-400/20 text-cyan-300 border border-cyan-400/40 font-semibold";
+        } else if (stepNum < currentStep) {
+          pill.className = "step-pill py-1 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30";
+        } else {
+          pill.className = "step-pill py-1 rounded bg-slate-900 text-slate-400 border border-hakaBorder";
+        }
+      });
+
       const isLast = currentStep === totalSteps;
       document.getElementById("btn-next").classList.toggle("hidden", isLast);
       document.getElementById("btn-submit").classList.toggle("hidden", !isLast);
+      document.getElementById("step-validation-msg").classList.add("hidden");
+    }
+
+    function validateCurrentStep() {
+      const activeContainer = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+      if (!activeContainer) return true;
+      const requiredFields = activeContainer.querySelectorAll("[required]");
+      let valid = true;
+
+      requiredFields.forEach((field) => {
+        field.classList.remove("input-error");
+        if (field.type === "checkbox" && !field.checked) {
+          valid = false;
+        } else if (field.type !== "checkbox" && !field.value.trim()) {
+          valid = false;
+          field.classList.add("input-error");
+        }
+      });
+
+      const msgBox = document.getElementById("step-validation-msg");
+      if (!valid) {
+        msgBox.textContent = "Completa los campos obligatorios marcados con (*) antes de continuar a la siguiente sección.";
+        msgBox.classList.remove("hidden");
+      } else {
+        msgBox.classList.add("hidden");
+      }
+      return valid;
     }
 
     function changeStep(delta) {
+      if (delta > 0 && !validateCurrentStep()) return;
       const next = currentStep + delta;
       if (next >= 1 && next <= totalSteps) {
         currentStep = next;
+        updateStepUI();
+      }
+    }
+
+    function goToStep(targetStep) {
+      if (targetStep > currentStep && !validateCurrentStep()) return;
+      if (targetStep >= 1 && targetStep <= totalSteps) {
+        currentStep = targetStep;
         updateStepUI();
       }
     }
@@ -805,12 +1037,23 @@
       document.getElementById("experiencia-detalle").classList.toggle("hidden", !hasExp);
     }
 
+    function updateCharCount(textareaId, counterId) {
+      const len = document.getElementById(textareaId).value.length;
+      document.getElementById(counterId).textContent = `${len} caracteres`;
+    }
+
     function getCheckedValues(name) {
       return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map((i) => i.value);
     }
 
     async function submitApplication(e) {
       e.preventDefault();
+      if (!validateCurrentStep()) return;
+
+      const submitBtn = document.getElementById("btn-submit");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Registrando...";
+
       const payload = {
         acepta_terminos: document.getElementById("acepta_terminos").checked,
         nombre_completo: document.getElementById("nombre_completo").value.trim(),
@@ -841,7 +1084,10 @@
       const alertBox = document.getElementById("submit-alert");
       if (!supabaseClient) {
         alertBox.classList.remove("hidden");
-        alertBox.textContent = "Supabase no está inicializado. Revisa la configuración en 'Config'.";
+        alertBox.className = "card-surface rounded-2xl p-5 border border-rose-500/40 bg-rose-500/10 text-rose-200 text-sm";
+        alertBox.textContent = "Error: No se detectó conexión con Supabase en config.js.";
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Enviar Postulación";
         return;
       }
 
@@ -851,13 +1097,25 @@
         alertBox.className = "card-surface rounded-2xl p-5 border border-rose-500/40 bg-rose-500/10 text-rose-200 text-sm";
         alertBox.textContent = "Error al guardar en Supabase: " + error.message;
       } else {
-        alertBox.className = "card-surface rounded-2xl p-5 border border-emerald-500/40 bg-emerald-500/10 text-emerald-200 text-sm";
-        alertBox.textContent = "Postulación registrada correctamente en Haka. Ya puedes revisarla y evaluarla con Gemini IA en el panel de RR. HH.";
+        alertBox.className = "card-surface rounded-2xl p-5 border border-emerald-500/40 bg-emerald-500/10 text-emerald-200 text-sm space-y-3";
+        alertBox.innerHTML = `
+          <p class="font-semibold text-white">Postulación registrada correctamente en Haka.</p>
+          <p>Tu perfil ya se encuentra almacenado en nuestra base de datos y listo para ser evaluado por el motor de inteligencia artificial.</p>
+          <button type="button" onclick="switchTab('dashboard')" class="btn-violet px-4 py-2 rounded-xl text-xs inline-flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5"><use href="#icon-spark" /></svg>
+            <span>Ir al Panel de RR. HH. y Evaluar</span>
+          </button>
+        `;
         document.getElementById("form-postulacion").reset();
+        updateCharCount("caso_rotacion_datadriven", "count-caso-1");
+        updateCharCount("caso_liderazgo_contencion", "count-caso-2");
         currentStep = 1;
         updateStepUI();
         toggleExperienceFields();
       }
+
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<svg class="w-4 h-4"><use href="#icon-check" /></svg><span>Enviar Postulación</span>';
     }
 
     async function loadCandidates() {
@@ -869,11 +1127,13 @@
         .order("created_at", { ascending: false });
 
       if (error) {
+        updateDbBadge(false, "Error Supabase");
         document.getElementById("candidates-tbody").innerHTML =
           `<tr><td colspan="6" class="p-6 text-center text-rose-300">Error al consultar Supabase: ${error.message}</td></tr>`;
         return;
       }
 
+      updateDbBadge(true, "Supabase Activo");
       candidatesCache = data || [];
       renderDashboard();
     }
@@ -881,6 +1141,9 @@
     function renderDashboard() {
       const total = candidatesCache.length;
       const evaluated = candidatesCache.filter((c) => c.ia_evaluado && typeof c.ia_puntaje === "number");
+      const pendingCount = total - evaluated.length;
+      const optimosCount = evaluated.filter((c) => c.ia_clasificacion === "Altamente Óptimo").length;
+
       const avg = evaluated.length
         ? Math.round(evaluated.reduce((acc, c) => acc + c.ia_puntaje, 0) / evaluated.length)
         : null;
@@ -888,31 +1151,60 @@
       const best = [...evaluated].sort((a, b) => b.ia_puntaje - a.ia_puntaje)[0];
 
       document.getElementById("kpi-total").textContent = total;
+      document.getElementById("kpi-pendientes").textContent = `${pendingCount} pendientes de evaluación`;
       document.getElementById("kpi-evaluados").textContent = evaluated.length;
+      document.getElementById("kpi-optimos-count").textContent = `${optimosCount} altamente óptimos`;
       document.getElementById("kpi-promedio").textContent = avg !== null ? `${avg}/100` : "--";
       document.getElementById("kpi-optimo").textContent = best ? best.nombre_completo : "Pendiente de evaluar";
       document.getElementById("kpi-optimo-score").textContent = best
         ? `Puntaje: ${best.ia_puntaje}/100 · ${best.ia_clasificacion || "Óptimo"}`
-        : "";
+        : "Ejecuta la evaluación IA";
+
+      const query = (document.getElementById("search-candidates")?.value || "").toLowerCase().trim();
+      const filterClass = document.getElementById("filter-clasificacion")?.value || "ALL";
+
+      const filtered = candidatesCache.filter((c) => {
+        const matchesSearch =
+          !query ||
+          (c.nombre_completo || "").toLowerCase().includes(query) ||
+          (c.carrera_especialidad || "").toLowerCase().includes(query) ||
+          (c.institucion_educativa || "").toLowerCase().includes(query) ||
+          (c.zona_residencia || "").toLowerCase().includes(query);
+
+        const matchesFilter =
+          filterClass === "ALL" ||
+          (filterClass === "SIN_EVALUAR" && !c.ia_evaluado) ||
+          c.ia_clasificacion === filterClass;
+
+        return matchesSearch && matchesFilter;
+      });
 
       const tbody = document.getElementById("candidates-tbody");
-      if (!total) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Aún no hay postulaciones registradas.</td></tr>`;
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">No se encontraron postulaciones con los filtros actuales.</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = candidatesCache.map((c, idx) => {
+      tbody.innerHTML = filtered.map((c) => {
+        const realIndex = candidatesCache.findIndex((item) => item.id === c.id);
+        const isBest = best && best.id === c.id;
+
         const badgeColor =
           c.ia_clasificacion === "Altamente Óptimo"
             ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/40"
             : c.ia_clasificacion === "Riesgo Detectado"
             ? "bg-rose-500/15 text-rose-300 border-rose-500/40"
-            : "bg-amber-500/15 text-amber-300 border-amber-500/40";
+            : c.ia_clasificacion === "Apto con Reserva"
+            ? "bg-amber-500/15 text-amber-300 border-amber-500/40"
+            : "bg-slate-800 text-slate-300 border-hakaBorder";
 
         return `
-          <tr class="hover:bg-slate-900/50">
+          <tr class="hover:bg-slate-900/60 transition">
             <td class="p-4">
-              <div class="font-semibold text-white">${c.nombre_completo}</div>
+              <div class="flex items-center gap-2">
+                <span class="font-semibold text-white">${c.nombre_completo}</span>
+                ${isBest ? '<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">TOP IA</span>' : ""}
+              </div>
               <div class="text-xs text-slate-400">${c.email} · ${c.zona_residencia}</div>
             </td>
             <td class="p-4">
@@ -930,8 +1222,13 @@
                 ${c.ia_clasificacion || "Sin evaluar"}
               </span>
             </td>
-            <td class="p-4">
-              <button onclick="showCandidateDetail(${idx})" class="text-xs text-cyan-300 hover:underline">Ver ficha</button>
+            <td class="p-4 text-right space-x-2 whitespace-nowrap">
+              <button onclick="evaluateSingleCandidate('${c.id}')" class="text-xs font-mono px-2.5 py-1 rounded-lg bg-violet-500/15 hover:bg-violet-500/30 text-violet-200 border border-violet-400/30 transition">
+                Evaluar IA
+              </button>
+              <button onclick="showCandidateDetail(${realIndex})" class="text-xs font-mono px-2.5 py-1 rounded-lg bg-cyan-400/10 hover:bg-cyan-400/20 text-cyan-300 border border-cyan-400/30 transition">
+                Ver ficha
+              </button>
             </td>
           </tr>
         `;
@@ -942,44 +1239,99 @@
       const c = candidatesCache[index];
       if (!c) return;
       document.getElementById("detail-name").textContent = `${c.nombre_completo} — ${c.carrera_especialidad}`;
+      const reEvalBtn = document.getElementById("detail-eval-btn");
+      reEvalBtn.onclick = () => evaluateSingleCandidate(c.id);
+
+      const scorePercent = typeof c.ia_puntaje === "number" ? c.ia_puntaje : 0;
+
       document.getElementById("detail-body").innerHTML = `
-        <div class="space-y-2">
-          <p><strong class="text-white">Contacto:</strong> ${c.telefono} | ${c.email}</p>
-          <p><strong class="text-white">Metodologías EX:</strong> ${(c.metodologias_ex || []).join(", ") || "Ninguna"}</p>
-          <p><strong class="text-white">Capacitaciones:</strong> ${(c.certificaciones || []).join(", ") || "Ninguna"}</p>
-          <p><strong class="text-white">Caso Rotación / Data-Driven:</strong> ${c.caso_rotacion_datadriven}</p>
-          <p><strong class="text-white">Caso Liderazgo / Contención:</strong> ${c.caso_liderazgo_contencion}</p>
+        <div class="space-y-3">
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-hakaBorder space-y-1.5">
+            <p class="text-xs font-mono text-cyan-300 uppercase">Datos de Contacto y Perfil</p>
+            <p><strong class="text-white">CI / Teléfono:</strong> ${c.ci} · ${c.telefono}</p>
+            <p><strong class="text-white">Correo / Zona:</strong> ${c.email} · ${c.zona_residencia}</p>
+            <p><strong class="text-white">Institución:</strong> ${c.institucion_educativa} (${c.estado_academico})</p>
+            <p><strong class="text-white">Disponibilidad / Pretensión:</strong> ${c.disponibilidad_inmediata} · ${c.pretension_salarial ? `Bs. ${c.pretension_salarial}` : "No especificada"}</p>
+            ${c.enlace_cv ? `<p><strong class="text-white">Enlace CV:</strong> <a href="${c.enlace_cv}" target="_blank" rel="noopener noreferrer" class="text-cyan-300 underline">Abrir documento</a></p>` : ""}
+          </div>
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-hakaBorder space-y-2">
+            <p class="text-xs font-mono text-cyan-300 uppercase">Metodologías y Respuestas Situacionales</p>
+            <p><strong class="text-white">Metodologías EX:</strong> ${(c.metodologias_ex || []).join(", ") || "Ninguna"}</p>
+            <p><strong class="text-white">Capacitaciones:</strong> ${(c.certificaciones || []).join(", ") || "Ninguna"}</p>
+            <div class="pt-1">
+              <p class="text-xs font-semibold text-white">Caso 1 (Diagnóstico & Data-Driven):</p>
+              <p class="text-xs text-slate-300 mt-0.5 bg-slate-950/70 p-2.5 rounded-lg border border-hakaBorder">${c.caso_rotacion_datadriven}</p>
+            </div>
+            <div class="pt-1">
+              <p class="text-xs font-semibold text-white">Caso 2 (Empatía Estructurada e Influencia):</p>
+              <p class="text-xs text-slate-300 mt-0.5 bg-slate-950/70 p-2.5 rounded-lg border border-hakaBorder">${c.caso_liderazgo_contencion}</p>
+            </div>
+          </div>
         </div>
-        <div class="space-y-2 bg-slate-900/70 p-4 rounded-xl border border-hakaBorder">
-          <p class="text-xs font-mono text-violet-300">EVALUACIÓN GEMINI AI</p>
-          <p><strong class="text-white">Puntaje:</strong> ${c.ia_puntaje ?? "N/D"} / 100 (${c.ia_clasificacion || "Pendiente"})</p>
-          <p><strong class="text-white">Resumen:</strong> ${c.ia_analisis_resumen || "Aún no evaluado"}</p>
-          <p><strong class="text-white">Competencias:</strong> ${c.ia_competencias_detalle || "-"}</p>
-          <p><strong class="text-white">Riesgos:</strong> ${c.ia_riesgos_detectados || "-"}</p>
+
+        <div class="space-y-3 bg-slate-900/70 p-5 rounded-xl border border-violet-500/30 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <p class="text-xs font-mono text-violet-300 uppercase">Dictamen Gemini Talent Engine</p>
+              <span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-violet-500/20 text-violet-200 border border-violet-400/30">
+                ${c.ia_clasificacion || "Sin evaluar"}
+              </span>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <span class="text-slate-300">Índice Global de Idoneidad</span>
+                <span class="text-cyan-300 font-bold">${c.ia_puntaje ?? 0} / 100</span>
+              </div>
+              <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-violet-500 to-cyan-400" style="width: ${scorePercent}%;"></div>
+              </div>
+            </div>
+
+            <div class="space-y-2 pt-1">
+              <div>
+                <p class="text-xs font-semibold text-white">Síntesis de Ajuste al Cargo:</p>
+                <p class="text-xs text-slate-300 leading-relaxed mt-0.5">${c.ia_analisis_resumen || "Aún no evaluado. Haz clic en 'Re-evaluar Perfil'."}</p>
+              </div>
+              <div>
+                <p class="text-xs font-semibold text-white">Desglose de Competencias Críticas:</p>
+                <p class="text-xs text-slate-300 leading-relaxed mt-0.5">${c.ia_competencias_detalle || "-"}</p>
+              </div>
+              <div class="p-3 rounded-lg bg-rose-500/10 border border-rose-500/25">
+                <p class="text-xs font-semibold text-rose-300">Matriz de Riesgos de Mala Elección:</p>
+                <p class="text-xs text-slate-200 leading-relaxed mt-0.5">${c.ia_riesgos_detectados || "Sin alertas registradas."}</p>
+              </div>
+            </div>
+          </div>
         </div>
       `;
-      document.getElementById("candidate-detail-card").classList.remove("hidden");
+      const detailCard = document.getElementById("candidate-detail-card");
+      detailCard.classList.remove("hidden");
+      detailCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
-    async function evaluateAllWithGemini() {
-      if (!candidatesCache.length) return;
-      if (!appConfig.geminiApiKey) {
-        alert("Configura primero la API Key de Gemini en 'Config'.");
-        return;
-      }
+    async function evaluateSingleCandidate(candidateId) {
+      const target = candidatesCache.find((c) => c.id === candidateId);
+      if (!target) return;
+      await evaluateCandidatesWithGemini([target], false);
+    }
+
+    async function evaluateCandidatesWithGemini(subset = null, updateExecutiveSummary = true) {
+      const listToEvaluate = subset || candidatesCache;
+      if (!listToEvaluate.length) return;
 
       const btn = document.getElementById("btn-eval-ai");
       btn.disabled = true;
-      btn.textContent = "Evaluando con Gemini IA...";
+      btn.textContent = "Analizando perfiles con Gemini IA...";
 
       const prompt = `
 Eres un psicólogo organizacional senior especialista en selección por competencias y experiencia del colaborador (Employee Experience) para la empresa Haka (industria de alimentos derivados lácteos).
 Evalúa los siguientes postulantes al cargo de "Gestor de Experiencia Corporativa".
 Criterios críticos:
-1. Capacidad de Análisis (Data-Driven): uso de métricas, eNPS, rotación, diagnóstico basado en evidencia y ROI.
-2. Empatía Estructurada y Contención: manejo objetivo de tensiones y acompañamiento humano.
-3. Visión Holística y Sistémica: abordaje de causas raíz culturales/operativas (no solo eventos recreativos aislados).
-4. Liderazgo de Influencia: capacidad de trabajar con jefaturas y mandos medios.
+1. Capacidad de Análisis (Data-Driven - 30%): uso de métricas, eNPS, rotación, diagnóstico basado en evidencia y ROI.
+2. Empatía Estructurada y Contención (25%): manejo objetivo de tensiones y acompañamiento humano.
+3. Visión Holística y Sistémica (25%): abordaje de causas raíz culturales/operativas (no solo eventos recreativos aislados).
+4. Liderazgo de Influencia (20%): capacidad de trabajar con jefaturas y mandos medios.
 Riesgos de mala elección a vigilar: perfil reducido a eventos recreativos, falta de empatía/contención o ausencia de visión data-driven.
 
 Devuelve ÚNICAMENTE un JSON válido con esta estructura exacta (sin markdown ni bloques de código):
@@ -998,11 +1350,11 @@ Devuelve ÚNICAMENTE un JSON válido con esta estructura exacta (sin markdown ni
 }
 
 Postulantes:
-${JSON.stringify(candidatesCache, null, 2)}
+${JSON.stringify(listToEvaluate, null, 2)}
 `;
 
       try {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(appConfig.geminiModel)}:generateContent?key=${encodeURIComponent(appConfig.geminiApiKey)}`;
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(HAKA_CONFIG.geminiModel)}:generateContent?key=${encodeURIComponent(HAKA_CONFIG.geminiApiKey)}`;
         const response = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -1019,8 +1371,10 @@ ${JSON.stringify(candidatesCache, null, 2)}
         }
 
         const parsed = JSON.parse(rawText);
-        document.getElementById("ai-executive-text").textContent = parsed.dictamen_general || "";
-        document.getElementById("ai-executive-summary").classList.remove("hidden");
+        if (updateExecutiveSummary && parsed.dictamen_general) {
+          document.getElementById("ai-executive-text").textContent = parsed.dictamen_general;
+          document.getElementById("ai-executive-summary").classList.remove("hidden");
+        }
 
         for (const item of (parsed.evaluaciones || [])) {
           if (!item.id) continue;
@@ -1038,12 +1392,26 @@ ${JSON.stringify(candidatesCache, null, 2)}
         }
 
         await loadCandidates();
+
+        if (subset && subset.length === 1) {
+          const updatedIdx = candidatesCache.findIndex((c) => c.id === subset[0].id);
+          if (updatedIdx !== -1) showCandidateDetail(updatedIdx);
+        }
       } catch (err) {
         alert("Error al evaluar con Gemini: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.innerHTML = '<svg class="w-4 h-4"><use href="#icon-spark" /></svg><span>Evaluar Perfiles con Gemini IA</span>';
+        btn.innerHTML = '<svg class="w-4 h-4"><use href="#icon-spark" /></svg><span>Evaluar Todos con Gemini IA</span>';
       }
+    }
+
+    function copyExecutiveSummary() {
+      const text = document.getElementById("ai-executive-text").textContent;
+      if (!text) return;
+      navigator.clipboard.writeText(text);
+      const label = document.getElementById("copy-dictamen-label");
+      label.textContent = "Copiado";
+      setTimeout(() => { label.textContent = "Copiar"; }, 2000);
     }
 
     function exportCSV() {
