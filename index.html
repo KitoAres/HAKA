@@ -6,7 +6,6 @@
   <title>HAKA — Carreras, Cultura & Gestión Humana</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -101,6 +100,48 @@
     .faq-item.open .faq-chevron {
       transform: rotate(180deg);
     }
+
+    /* Animaciones del Avatar 2D Valeria */
+    @keyframes avatarBreathe {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-3px) rotate(0.6deg); }
+    }
+    @keyframes avatarBlink {
+      0%, 94%, 100% { transform: scaleY(1); }
+      97% { transform: scaleY(0.08); }
+    }
+    @keyframes avatarTalk {
+      0%, 100% { transform: scaleY(0.35); }
+      25% { transform: scaleY(1); }
+      50% { transform: scaleY(0.55); }
+      75% { transform: scaleY(0.95); }
+    }
+    @keyframes avatarWave {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-14deg); }
+      50% { transform: rotate(8deg); }
+      75% { transform: rotate(-10deg); }
+    }
+    .valeria-body {
+      animation: avatarBreathe 3.8s ease-in-out infinite;
+      transform-origin: center bottom;
+    }
+    .valeria-eyes {
+      animation: avatarBlink 4.2s infinite;
+      transform-origin: center 54px;
+    }
+    .valeria-mouth {
+      transform-origin: center 69px;
+      transform: scaleY(0.35);
+      transition: transform 0.1s ease;
+    }
+    .valeria-speaking .valeria-mouth {
+      animation: avatarTalk 0.28s infinite;
+    }
+    .valeria-speaking .valeria-hand {
+      animation: avatarWave 1.4s ease-in-out infinite;
+      transform-origin: 96px 96px;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-cyan-400 selection:text-slate-950">
@@ -159,6 +200,15 @@
     <symbol id="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <rect x="9" y="9" width="13" height="13" rx="2" />
       <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </symbol>
+    <symbol id="icon-volume" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" />
+    </symbol>
+    <symbol id="icon-mute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6" />
+    </symbol>
+    <symbol id="icon-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
     </symbol>
   </svg>
 
@@ -388,7 +438,7 @@
       </div>
     </section>
 
-    <!-- FICHA DE VACANTE CON NAVEGACIÓN DE CONTENIDO INTERNA -->
+    <!-- FICHA DE VACANTE -->
     <section id="vacante" class="border-t border-b border-hakaBorder bg-hakaSurface/60 py-20">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 space-y-8">
         <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
@@ -398,7 +448,6 @@
             <p class="text-slate-400 text-sm sm:text-base">Employee Experience Manager · Gestión Humana & Desarrollo Organizacional</p>
           </div>
 
-          <!-- Selector de sub-sección de la vacante -->
           <div class="flex flex-wrap gap-2 bg-hakaBg p-1.5 rounded-xl border border-hakaBorder w-fit">
             <button type="button" onclick="switchRoleSubtab('fases')" id="role-btn-fases" class="role-subtab px-4 py-2 rounded-lg text-xs font-semibold bg-cyan-400/15 text-cyan-300 border border-cyan-400/30 transition">
               Propósito y Fases
@@ -412,7 +461,6 @@
           </div>
         </div>
 
-        <!-- Subtab 1: Propósito y Fases -->
         <div id="role-panel-fases" class="role-panel grid lg:grid-cols-12 gap-8">
           <div class="lg:col-span-5 glass-panel rounded-2xl p-6 space-y-4">
             <h3 class="text-lg font-bold text-white">Propósito Sistémico del Rol</h3>
@@ -448,7 +496,6 @@
           </div>
         </div>
 
-        <!-- Subtab 2: Competencias Evaluadas -->
         <div id="role-panel-competencias" class="role-panel hidden grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           <div class="glass-panel rounded-2xl p-6 space-y-2.5">
             <div class="flex items-center justify-between">
@@ -484,7 +531,6 @@
           </div>
         </div>
 
-        <!-- Subtab 3: Requisitos y Beneficios -->
         <div id="role-panel-requisitos" class="role-panel hidden grid md:grid-cols-2 gap-6">
           <div class="glass-panel rounded-2xl p-6 space-y-3">
             <h3 class="font-bold text-white text-base">Perfil Académico y Técnico</h3>
@@ -784,7 +830,7 @@
       </div>
     </section>
 
-    <!-- PREGUNTAS FRECUENTES (ACORDEÓN) -->
+    <!-- PREGUNTAS FRECUENTES -->
     <section id="faq" class="max-w-4xl mx-auto px-4 sm:px-6 py-16 space-y-6">
       <div class="space-y-1.5">
         <span class="text-xs font-mono uppercase tracking-widest text-cyan-400">Dudas Frecuentes</span>
@@ -935,6 +981,105 @@
     </div>
   </section>
 
+  <!-- ASISTENTE VIRTUAL 2D ANIMADA: VALERIA (ANFITRIONA DE EXPERIENCIA HAKA) -->
+  <div id="valeria-widget" class="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3 max-w-[350px] sm:max-w-[380px]">
+    <!-- Panel de diálogo y chat de Valeria -->
+    <div id="valeria-chat-box" class="glass-panel rounded-2xl p-4 shadow-2xl border border-cyan-400/40 w-full space-y-3 transition-all duration-300">
+      <div class="flex items-center justify-between border-b border-hakaBorder pb-2.5">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <div>
+            <p class="text-xs font-extrabold text-white tracking-wide">Valeria · Anfitriona Haka</p>
+            <p class="text-[10px] font-mono text-cyan-300">Experiencia & Talento Humano</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button type="button" onclick="toggleValeriaVoice()" id="btn-valeria-voice" title="Activar o silenciar voz" class="p-1.5 rounded-lg bg-hakaBg hover:bg-slate-800 text-cyan-300 border border-hakaBorder">
+            <svg id="icon-voice-state" class="w-3.5 h-3.5"><use href="#icon-volume" /></svg>
+          </button>
+          <button type="button" onclick="toggleValeriaPanel()" class="text-xs px-2 py-1 rounded-lg bg-hakaBg text-slate-400 hover:text-white border border-hakaBorder">
+            —
+          </button>
+        </div>
+      </div>
+
+      <!-- Mensaje activo / historial -->
+      <div id="valeria-messages" class="max-h-44 overflow-y-auto space-y-2.5 pr-1 text-xs leading-relaxed">
+        <div class="bg-hakaBg/90 border border-hakaBorder rounded-xl p-3 text-slate-200">
+          ¡Hola! Soy <strong class="text-cyan-300">Valeria</strong>, anfitriona de Gestión Humana en <strong class="text-white">Haka</strong>. Qué gusto recibirte en nuestro portal de carreras. ¿Quieres que te cuente sobre el cargo de <em>Gestor de Experiencia Corporativa</em> o te ayude con tu postulación?
+        </div>
+      </div>
+
+      <!-- Accesos rápidos -->
+      <div class="flex flex-wrap gap-1.5">
+        <button type="button" onclick="askValeriaQuick('¿De qué trata el puesto de Gestor de Experiencia Corporativa?')" class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-cyan-400/10 hover:bg-cyan-400/20 text-cyan-300 border border-cyan-400/30 transition">
+          Sobre el cargo
+        </button>
+        <button type="button" onclick="askValeriaQuick('¿Qué evalúan en los casos situacionales?')" class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-cyan-400/10 hover:bg-cyan-400/20 text-cyan-300 border border-cyan-400/30 transition">
+          Tips para los casos
+        </button>
+        <button type="button" onclick="valeriaRepeatWelcome()" class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-hakaBorder transition">
+          Escuchar bienvenida
+        </button>
+      </div>
+
+      <!-- Entrada de pregunta libre -->
+      <form onsubmit="handleValeriaChat(event)" class="flex items-center gap-2">
+        <input type="text" id="valeria-input" class="input-field !py-2 !text-xs" placeholder="Pregúntale a Valeria sobre Haka..." />
+        <button type="submit" id="valeria-send-btn" class="btn-cyan p-2.5 rounded-lg shrink-0" title="Enviar consulta">
+          <svg class="w-3.5 h-3.5"><use href="#icon-send" /></svg>
+        </button>
+      </form>
+    </div>
+
+    <!-- Personaje 2D Vectorial Interactivo -->
+    <button type="button" onclick="toggleValeriaPanel()" id="valeria-avatar-btn" class="group relative flex items-center gap-3 bg-hakaCard/95 hover:bg-slate-900 border border-cyan-400/45 rounded-full pl-2 pr-4 py-1.5 shadow-2xl transition">
+      <div class="w-14 h-14 rounded-full bg-gradient-to-b from-cyan-500/25 to-slate-950 border border-cyan-400/50 overflow-hidden flex items-end justify-center shrink-0">
+        <!-- SVG Modelo 2D Corporativo Animado -->
+        <svg viewBox="0 0 120 120" class="w-14 h-14 valeria-body">
+          <!-- Cabello trasero -->
+          <path d="M30 48 C28 78, 25 98, 35 108 L85 108 C95 98, 92 78, 90 48 C88 22, 32 22, 30 48 Z" fill="#1E293B" />
+          <!-- Cuello -->
+          <rect x="52" y="75" width="16" height="16" rx="6" fill="#F1C2A5" />
+          <!-- Traje Corporativo Haka -->
+          <path d="M26 118 C28 94, 42 88, 60 88 C78 88, 92 94, 94 118 Z" fill="#0F172A" stroke="#22D3EE" stroke-width="1.5" />
+          <path d="M48 88 L60 106 L72 88 Z" fill="#E2E8F0" />
+          <path d="M57 93 L60 105 L63 93 Z" fill="#22D3EE" />
+          <!-- Mano saludando -->
+          <g class="valeria-hand">
+            <circle cx="96" cy="96" r="6" fill="#F1C2A5" />
+          </g>
+          <!-- Rostro -->
+          <path d="M38 48 C38 30, 82 30, 82 48 C82 68, 71 80, 60 80 C49 80, 38 68, 38 48 Z" fill="#F8D2BA" />
+          <!-- Flequillo / Cabello frontal -->
+          <path d="M36 48 C37 26, 83 26, 84 48 C78 36, 66 33, 56 38 C47 33, 40 38, 36 48 Z" fill="#0F172A" />
+          <!-- Rubor suave -->
+          <ellipse cx="45" cy="61" rx="4.5" ry="2.2" fill="#FDA4AF" opacity="0.45" />
+          <ellipse cx="75" cy="61" rx="4.5" ry="2.2" fill="#FDA4AF" opacity="0.45" />
+          <!-- Ojos animados -->
+          <g class="valeria-eyes">
+            <ellipse cx="49" cy="54" rx="3.4" ry="4" fill="#0F172A" />
+            <circle cx="50" cy="52.8" r="1.2" fill="#FFFFFF" />
+            <ellipse cx="71" cy="54" rx="3.4" ry="4" fill="#0F172A" />
+            <circle cx="72" cy="52.8" r="1.2" fill="#FFFFFF" />
+          </g>
+          <!-- Cejas -->
+          <path d="M44 47 Q49 45 54 47" stroke="#0F172A" stroke-width="1.8" fill="none" stroke-linecap="round" />
+          <path d="M66 47 Q71 45 76 47" stroke="#0F172A" stroke-width="1.8" fill="none" stroke-linecap="round" />
+          <!-- Boca con Lip-Sync -->
+          <ellipse cx="60" cy="69" rx="5.2" ry="3.8" fill="#E11D48" class="valeria-mouth" />
+          <!-- Auricular de atención -->
+          <path d="M36 52 A24 24 0 0 1 84 52" stroke="#22D3EE" stroke-width="2" fill="none" />
+          <circle cx="36" cy="55" r="3" fill="#22D3EE" />
+        </svg>
+      </div>
+      <div class="text-left">
+        <span class="block text-xs font-extrabold text-white group-hover:text-cyan-300 transition">Valeria</span>
+        <span class="block text-[10px] font-mono text-cyan-400">Guía de Postulación</span>
+      </div>
+    </button>
+  </div>
+
   <!-- FOOTER CORPORATIVO -->
   <footer class="border-t border-hakaBorder bg-hakaBg py-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
@@ -952,8 +1097,7 @@
   </footer>
 
   <script>
-    // Configuración predeterminada (sin botón ni modal de configuración)
-// Configuración predeterminada con tu API Key válida de Google AI Studio
+    // Configuración predeterminada con API Key válida
     const HAKA_CONFIG = {
       supabaseUrl: "https://burorropwmyktqjsieie.supabase.co",
       supabasePublishableKey: "sb_publishable_toU_3jxw_Sb53UvFhcq9Rg_kZu3t2LC",
@@ -966,6 +1110,8 @@
     let candidatesCache = [];
     let currentStep = 1;
     const totalSteps = 6;
+    let valeriaVoiceEnabled = true;
+    let valeriaWelcomed = false;
 
     function initSupabase() {
       if (window.supabase && HAKA_CONFIG.supabaseUrl && HAKA_CONFIG.supabasePublishableKey) {
@@ -973,6 +1119,126 @@
       }
     }
 
+    // --- LÓGICA DE VALERIA (ASISTENTE 2D + VOZ + CONSULTAS) ---
+    function setValeriaSpeaking(isSpeaking) {
+      const widget = document.getElementById("valeria-widget");
+      if (widget) widget.classList.toggle("valeria-speaking", isSpeaking);
+    }
+
+    function speakAsValeria(text) {
+      if (!valeriaVoiceEnabled || !("speechSynthesis" in window)) {
+        setValeriaSpeaking(true);
+        setTimeout(() => setValeriaSpeaking(false), Math.min(4500, text.length * 45));
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "es-ES";
+      utterance.rate = 1.03;
+      utterance.pitch = 1.08;
+
+      const voices = window.speechSynthesis.getVoices();
+      const spanishFemale = voices.find((v) => v.lang.startsWith("es") && /female|paulina|monica|helena|sabina|laura|google español/i.test(v.name))
+        || voices.find((v) => v.lang.startsWith("es"));
+      if (spanishFemale) utterance.voice = spanishFemale;
+
+      utterance.onstart = () => setValeriaSpeaking(true);
+      utterance.onend = () => setValeriaSpeaking(false);
+      utterance.onerror = () => setValeriaSpeaking(false);
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function toggleValeriaVoice() {
+      valeriaVoiceEnabled = !valeriaVoiceEnabled;
+      const iconUse = document.querySelector("#icon-voice-state use");
+      if (iconUse) iconUse.setAttribute("href", valeriaVoiceEnabled ? "#icon-volume" : "#icon-mute");
+      if (!valeriaVoiceEnabled && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+        setValeriaSpeaking(false);
+      }
+    }
+
+    function toggleValeriaPanel() {
+      document.getElementById("valeria-chat-box").classList.toggle("hidden");
+    }
+
+    function appendValeriaMessage(sender, htmlText) {
+      const container = document.getElementById("valeria-messages");
+      const bubble = document.createElement("div");
+      if (sender === "user") {
+        bubble.className = "bg-cyan-400/15 border border-cyan-400/30 rounded-xl p-2.5 text-cyan-100 ml-6";
+      } else {
+        bubble.className = "bg-hakaBg/90 border border-hakaBorder rounded-xl p-3 text-slate-200";
+      }
+      bubble.innerHTML = htmlText;
+      container.appendChild(bubble);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function valeriaRepeatWelcome() {
+      const msg = "Hola, bienvenido a Haka. Soy Valeria, de Gestión Humana. Estamos buscando a nuestro próximo Gestor de Experiencia Corporativa para liderar el bienestar y la cultura de nuestra planta y oficinas. Puedes revisar la ficha del puesto o iniciar tu postulación aquí mismo.";
+      speakAsValeria(msg);
+    }
+
+    async function askValeriaQuick(question) {
+      document.getElementById("valeria-input").value = question;
+      await handleValeriaChat(new Event("submit"));
+    }
+
+    async function handleValeriaChat(e) {
+      e.preventDefault();
+      const input = document.getElementById("valeria-input");
+      const question = input.value.trim();
+      if (!question) return;
+
+      input.value = "";
+      appendValeriaMessage("user", question);
+
+      const sendBtn = document.getElementById("valeria-send-btn");
+      sendBtn.disabled = true;
+
+      const systemContext = `
+Eres Valeria, anfitriona corporativa y especialista de Experiencia del Colaborador en Haka (empresa de alimentos derivados lácteos).
+Responde de forma cálida, profesional, breve (máximo 3 oraciones) y directa en español.
+Información de la empresa y vacante:
+- Empresa: Haka, dedicada a derivados lácteos con estándares ISO/BPM y enfoque en bienestar humano.
+- Vacante abierta: Gestor de Experiencia Corporativa (Employee Experience Manager), reporta a Dirección de Gestión Humana.
+- Competencias evaluadas: Análisis Data-Driven (eNPS, clima, rotación, ausentismo - 30%), Empatía Estructurada y contención emocional (25%), Visión Sistémica (25%), Liderazgo de Influencia (20%).
+- Proceso: Formulario de 6 pasos con 2 casos situacionales técnicos, revisión por comité y entrevista.
+Consulta del usuario: ${question}
+`;
+
+      try {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(HAKA_CONFIG.geminiModel)}:generateContent?key=${encodeURIComponent(HAKA_CONFIG.geminiApiKey)}`;
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: systemContext }] }]
+          })
+        });
+        const data = await response.json();
+        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Con gusto te ayudo. Puedes completar tu postulación en las 6 secciones del formulario.";
+        appendValeriaMessage("valeria", reply);
+        speakAsValeria(reply);
+      } catch {
+        const fallback = "Estoy aquí para guiarte en tu postulación al cargo de Gestor de Experiencia Corporativa en Haka.";
+        appendValeriaMessage("valeria", fallback);
+        speakAsValeria(fallback);
+      } finally {
+        sendBtn.disabled = false;
+      }
+    }
+
+    // Dispara la bienvenida hablada de Valeria en la primera interacción con la página (requerido por navegadores modernos para audio)
+    window.addEventListener("pointerdown", () => {
+      if (!valeriaWelcomed) {
+        valeriaWelcomed = true;
+        valeriaRepeatWelcome();
+      }
+    }, { once: true });
+
+    // --- NAVEGACIÓN Y FORMULARIO ---
     function showPortalView() {
       document.getElementById("portal-landing").classList.remove("hidden");
       document.getElementById("view-dashboard").classList.add("hidden");
@@ -1066,6 +1332,11 @@
       if (next >= 1 && next <= totalSteps) {
         currentStep = next;
         updateStepUI();
+        if (currentStep === 5) {
+          const tip = "Estás en la sección de escenarios situacionales. Te recomiendo mencionar métricas concretas como rotación, ausentismo o eNPS.";
+          appendValeriaMessage("valeria", tip);
+          speakAsValeria(tip);
+        }
       }
     }
 
@@ -1136,9 +1407,11 @@
       submitBtn.disabled = true;
       submitBtn.textContent = "Registrando...";
 
+      const candidateName = document.getElementById("nombre_completo").value.trim();
+
       const payload = {
         acepta_terminos: document.getElementById("acepta_terminos").checked,
-        nombre_completo: document.getElementById("nombre_completo").value.trim(),
+        nombre_completo: candidateName,
         ci: document.getElementById("ci").value.trim(),
         fecha_nacimiento: document.getElementById("fecha_nacimiento").value,
         telefono: document.getElementById("telefono").value.trim(),
@@ -1177,6 +1450,10 @@
           <p class="font-bold text-white">Postulación recibida correctamente en Haka.</p>
           <p>Gracias por postular al cargo de Gestor de Experiencia Corporativa. Nuestro comité revisará tu perfil y casos situacionales.</p>
         `;
+        const thanksMsg = `Muchas gracias ${candidateName}. Hemos registrado tu postulación en Haka con éxito. Nuestro equipo de Gestión Humana revisará tus respuestas pronto.`;
+        appendValeriaMessage("valeria", thanksMsg);
+        speakAsValeria(thanksMsg);
+
         document.getElementById("form-postulacion").reset();
         updateCharCount("caso_rotacion_datadriven", "count-caso-1");
         updateCharCount("caso_liderazgo_contencion", "count-caso-2");
@@ -1189,6 +1466,7 @@
       submitBtn.innerHTML = '<svg class="w-4 h-4"><use href="#icon-check" /></svg><span>Enviar Postulación</span>';
     }
 
+    // --- PANEL DE GESTIÓN HUMANA ---
     async function loadCandidates() {
       if (!supabaseClient) return;
       const { data, error } = await supabaseClient
