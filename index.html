@@ -6,6 +6,12 @@
   <title>HAKA — Carreras, Cultura & Gestión Humana</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Motor Live2D Cubism & PixiJS para modelo 2D dinámico con física en tiempo real -->
+  <script src="https://cdn.jsdelivr.net/npm/pixi.js@6.5.10/dist/browser/pixi.min.js"></script>
+  <script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/dylanNew/live2d/webgl/Live2D/lib/live2d.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/index.min.js"></script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -99,48 +105,6 @@
     }
     .faq-item.open .faq-chevron {
       transform: rotate(180deg);
-    }
-
-    /* Animaciones del Avatar 2D Valeria */
-    @keyframes avatarBreathe {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-3px) rotate(0.6deg); }
-    }
-    @keyframes avatarBlink {
-      0%, 94%, 100% { transform: scaleY(1); }
-      97% { transform: scaleY(0.08); }
-    }
-    @keyframes avatarTalk {
-      0%, 100% { transform: scaleY(0.35); }
-      25% { transform: scaleY(1); }
-      50% { transform: scaleY(0.55); }
-      75% { transform: scaleY(0.95); }
-    }
-    @keyframes avatarWave {
-      0%, 100% { transform: rotate(0deg); }
-      25% { transform: rotate(-14deg); }
-      50% { transform: rotate(8deg); }
-      75% { transform: rotate(-10deg); }
-    }
-    .valeria-body {
-      animation: avatarBreathe 3.8s ease-in-out infinite;
-      transform-origin: center bottom;
-    }
-    .valeria-eyes {
-      animation: avatarBlink 4.2s infinite;
-      transform-origin: center 54px;
-    }
-    .valeria-mouth {
-      transform-origin: center 69px;
-      transform: scaleY(0.35);
-      transition: transform 0.1s ease;
-    }
-    .valeria-speaking .valeria-mouth {
-      animation: avatarTalk 0.28s infinite;
-    }
-    .valeria-speaking .valeria-hand {
-      animation: avatarWave 1.4s ease-in-out infinite;
-      transform-origin: 96px 96px;
     }
   </style>
 </head>
@@ -981,10 +945,10 @@
     </div>
   </section>
 
-  <!-- ASISTENTE VIRTUAL 2D ANIMADA: VALERIA (ANFITRIONA DE EXPERIENCIA HAKA) -->
-  <div id="valeria-widget" class="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3 max-w-[350px] sm:max-w-[380px]">
-    <!-- Panel de diálogo y chat de Valeria -->
-    <div id="valeria-chat-box" class="glass-panel rounded-2xl p-4 shadow-2xl border border-cyan-400/40 w-full space-y-3 transition-all duration-300">
+  <!-- ANFITRIONA LIVE2D REAL: VALERIA (MODELO 2D DINÁMICO + VOZ FEMENINA) -->
+  <div id="valeria-widget" class="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2 pointer-events-none">
+    <!-- Caja de diálogo y chat -->
+    <div id="valeria-chat-box" class="pointer-events-auto glass-panel rounded-2xl p-4 shadow-2xl border border-cyan-400/40 w-[340px] sm:w-[370px] space-y-3 transition-all duration-300">
       <div class="flex items-center justify-between border-b border-hakaBorder pb-2.5">
         <div class="flex items-center gap-2">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -994,23 +958,21 @@
           </div>
         </div>
         <div class="flex items-center gap-1.5">
-          <button type="button" onclick="toggleValeriaVoice()" id="btn-valeria-voice" title="Activar o silenciar voz" class="p-1.5 rounded-lg bg-hakaBg hover:bg-slate-800 text-cyan-300 border border-hakaBorder">
+          <button type="button" onclick="toggleValeriaVoice()" title="Activar o silenciar voz" class="p-1.5 rounded-lg bg-hakaBg hover:bg-slate-800 text-cyan-300 border border-hakaBorder">
             <svg id="icon-voice-state" class="w-3.5 h-3.5"><use href="#icon-volume" /></svg>
           </button>
-          <button type="button" onclick="toggleValeriaPanel()" class="text-xs px-2 py-1 rounded-lg bg-hakaBg text-slate-400 hover:text-white border border-hakaBorder">
+          <button type="button" onclick="toggleValeriaPanel()" title="Minimizar chat" class="text-xs px-2 py-1 rounded-lg bg-hakaBg text-slate-400 hover:text-white border border-hakaBorder">
             —
           </button>
         </div>
       </div>
 
-      <!-- Mensaje activo / historial -->
-      <div id="valeria-messages" class="max-h-44 overflow-y-auto space-y-2.5 pr-1 text-xs leading-relaxed">
+      <div id="valeria-messages" class="max-h-40 overflow-y-auto space-y-2.5 pr-1 text-xs leading-relaxed">
         <div class="bg-hakaBg/90 border border-hakaBorder rounded-xl p-3 text-slate-200">
-          ¡Hola! Soy <strong class="text-cyan-300">Valeria</strong>, anfitriona de Gestión Humana en <strong class="text-white">Haka</strong>. Qué gusto recibirte en nuestro portal de carreras. ¿Quieres que te cuente sobre el cargo de <em>Gestor de Experiencia Corporativa</em> o te ayude con tu postulación?
+          ¡Hola! Soy <strong class="text-cyan-300">Valeria</strong>, anfitriona de Gestión Humana en <strong class="text-white">Haka</strong>. Estoy aquí para darte la bienvenida y acompañarte en tu postulación al cargo de <em>Gestor de Experiencia Corporativa</em>.
         </div>
       </div>
 
-      <!-- Accesos rápidos -->
       <div class="flex flex-wrap gap-1.5">
         <button type="button" onclick="askValeriaQuick('¿De qué trata el puesto de Gestor de Experiencia Corporativa?')" class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-cyan-400/10 hover:bg-cyan-400/20 text-cyan-300 border border-cyan-400/30 transition">
           Sobre el cargo
@@ -1023,7 +985,6 @@
         </button>
       </div>
 
-      <!-- Entrada de pregunta libre -->
       <form onsubmit="handleValeriaChat(event)" class="flex items-center gap-2">
         <input type="text" id="valeria-input" class="input-field !py-2 !text-xs" placeholder="Pregúntale a Valeria sobre Haka..." />
         <button type="submit" id="valeria-send-btn" class="btn-cyan p-2.5 rounded-lg shrink-0" title="Enviar consulta">
@@ -1032,52 +993,15 @@
       </form>
     </div>
 
-    <!-- Personaje 2D Vectorial Interactivo -->
-    <button type="button" onclick="toggleValeriaPanel()" id="valeria-avatar-btn" class="group relative flex items-center gap-3 bg-hakaCard/95 hover:bg-slate-900 border border-cyan-400/45 rounded-full pl-2 pr-4 py-1.5 shadow-2xl transition">
-      <div class="w-14 h-14 rounded-full bg-gradient-to-b from-cyan-500/25 to-slate-950 border border-cyan-400/50 overflow-hidden flex items-end justify-center shrink-0">
-        <!-- SVG Modelo 2D Corporativo Animado -->
-        <svg viewBox="0 0 120 120" class="w-14 h-14 valeria-body">
-          <!-- Cabello trasero -->
-          <path d="M30 48 C28 78, 25 98, 35 108 L85 108 C95 98, 92 78, 90 48 C88 22, 32 22, 30 48 Z" fill="#1E293B" />
-          <!-- Cuello -->
-          <rect x="52" y="75" width="16" height="16" rx="6" fill="#F1C2A5" />
-          <!-- Traje Corporativo Haka -->
-          <path d="M26 118 C28 94, 42 88, 60 88 C78 88, 92 94, 94 118 Z" fill="#0F172A" stroke="#22D3EE" stroke-width="1.5" />
-          <path d="M48 88 L60 106 L72 88 Z" fill="#E2E8F0" />
-          <path d="M57 93 L60 105 L63 93 Z" fill="#22D3EE" />
-          <!-- Mano saludando -->
-          <g class="valeria-hand">
-            <circle cx="96" cy="96" r="6" fill="#F1C2A5" />
-          </g>
-          <!-- Rostro -->
-          <path d="M38 48 C38 30, 82 30, 82 48 C82 68, 71 80, 60 80 C49 80, 38 68, 38 48 Z" fill="#F8D2BA" />
-          <!-- Flequillo / Cabello frontal -->
-          <path d="M36 48 C37 26, 83 26, 84 48 C78 36, 66 33, 56 38 C47 33, 40 38, 36 48 Z" fill="#0F172A" />
-          <!-- Rubor suave -->
-          <ellipse cx="45" cy="61" rx="4.5" ry="2.2" fill="#FDA4AF" opacity="0.45" />
-          <ellipse cx="75" cy="61" rx="4.5" ry="2.2" fill="#FDA4AF" opacity="0.45" />
-          <!-- Ojos animados -->
-          <g class="valeria-eyes">
-            <ellipse cx="49" cy="54" rx="3.4" ry="4" fill="#0F172A" />
-            <circle cx="50" cy="52.8" r="1.2" fill="#FFFFFF" />
-            <ellipse cx="71" cy="54" rx="3.4" ry="4" fill="#0F172A" />
-            <circle cx="72" cy="52.8" r="1.2" fill="#FFFFFF" />
-          </g>
-          <!-- Cejas -->
-          <path d="M44 47 Q49 45 54 47" stroke="#0F172A" stroke-width="1.8" fill="none" stroke-linecap="round" />
-          <path d="M66 47 Q71 45 76 47" stroke="#0F172A" stroke-width="1.8" fill="none" stroke-linecap="round" />
-          <!-- Boca con Lip-Sync -->
-          <ellipse cx="60" cy="69" rx="5.2" ry="3.8" fill="#E11D48" class="valeria-mouth" />
-          <!-- Auricular de atención -->
-          <path d="M36 52 A24 24 0 0 1 84 52" stroke="#22D3EE" stroke-width="2" fill="none" />
-          <circle cx="36" cy="55" r="3" fill="#22D3EE" />
-        </svg>
+    <!-- Lienzo Live2D WebGL Interactivo (Sin recortes, movimiento completo y seguimiento de mirada) -->
+    <div class="pointer-events-auto relative flex items-end justify-end">
+      <div onclick="triggerValeriaTapMotion()" title="Haz clic para interactuar con Valeria" class="cursor-pointer relative w-[220px] h-[250px] flex items-end justify-center">
+        <canvas id="valeria-live2d-canvas" class="w-[220px] h-[250px] drop-shadow-[0_12px_28px_rgba(34,211,238,0.28)]"></canvas>
+        <button type="button" onclick="event.stopPropagation(); toggleValeriaPanel();" class="absolute bottom-2 right-2 px-3 py-1 rounded-full bg-hakaCard/95 border border-cyan-400/50 text-[11px] font-bold text-cyan-300 shadow-lg hover:bg-slate-900 transition">
+          Valeria · Chat
+        </button>
       </div>
-      <div class="text-left">
-        <span class="block text-xs font-extrabold text-white group-hover:text-cyan-300 transition">Valeria</span>
-        <span class="block text-[10px] font-mono text-cyan-400">Guía de Postulación</span>
-      </div>
-    </button>
+    </div>
   </div>
 
   <!-- FOOTER CORPORATIVO -->
@@ -1097,7 +1021,7 @@
   </footer>
 
   <script>
-    // Configuración predeterminada con API Key válida
+    // Configuración predeterminada
     const HAKA_CONFIG = {
       supabaseUrl: "https://burorropwmyktqjsieie.supabase.co",
       supabasePublishableKey: "sb_publishable_toU_3jxw_Sb53UvFhcq9Rg_kZu3t2LC",
@@ -1110,8 +1034,13 @@
     let candidatesCache = [];
     let currentStep = 1;
     const totalSteps = 6;
+
+    // Variables Live2D + Voz Femenina
+    let live2dModel = null;
+    let isValeriaSpeaking = false;
     let valeriaVoiceEnabled = true;
     let valeriaWelcomed = false;
+    let availableVoices = [];
 
     function initSupabase() {
       if (window.supabase && HAKA_CONFIG.supabaseUrl && HAKA_CONFIG.supabasePublishableKey) {
@@ -1119,32 +1048,122 @@
       }
     }
 
-    // --- LÓGICA DE VALERIA (ASISTENTE 2D + VOZ + CONSULTAS) ---
-    function setValeriaSpeaking(isSpeaking) {
-      const widget = document.getElementById("valeria-widget");
-      if (widget) widget.classList.toggle("valeria-speaking", isSpeaking);
+    // --- MOTOR LIVE2D CUBISM DINÁMICO ---
+    async function initValeriaLive2D() {
+      const canvas = document.getElementById("valeria-live2d-canvas");
+      if (!canvas || !window.PIXI || !window.PIXI.live2d) return;
+
+      try {
+        const app = new PIXI.Application({
+          view: canvas,
+          width: 220,
+          height: 250,
+          transparent: true,
+          autoStart: true,
+          antialias: true
+        });
+
+        // Modelo oficial Live2D Cubism (Haru Greeter - Anfitriona corporativa dinámica)
+        const modelUrl = "https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display/test/assets/haru/haru_greeter_t03.model3.json";
+        live2dModel = await PIXI.live2d.Live2DModel.from(modelUrl);
+
+        app.stage.addChild(live2dModel);
+        live2dModel.scale.set(0.145);
+        live2dModel.anchor.set(0.5, 0.08);
+        live2dModel.x = 110;
+        live2dModel.y = 14;
+
+        // Seguimiento de mirada y cabeza con el movimiento del ratón
+        window.addEventListener("mousemove", (e) => {
+          if (live2dModel) {
+            live2dModel.focus(e.clientX, e.clientY);
+          }
+        });
+
+        // Bucle de movimiento natural + sincronización labial al hablar
+        app.ticker.add(() => {
+          if (!live2dModel || !live2dModel.internalModel) return;
+          const core = live2dModel.internalModel.coreModel;
+          const t = performance.now() / 1000;
+
+          // Balanceo suave corporal y de cabeza continuo
+          core.setParameterValueById("ParamBodyAngleX", Math.sin(t * 1.4) * 3.5);
+          core.setParameterValueById("ParamAngleZ", Math.cos(t * 1.1) * 3.0);
+
+          // Apertura labial rítmica mientras Valeria habla
+          if (isValeriaSpeaking) {
+            const mouthOpen = Math.abs(Math.sin(t * 16)) * 0.85 + 0.1;
+            core.setParameterValueById("ParamMouthOpenY", mouthOpen);
+          } else {
+            core.setParameterValueById("ParamMouthOpenY", 0);
+          }
+        });
+
+        // Saludo gestual inicial
+        setTimeout(() => triggerValeriaTapMotion(), 800);
+      } catch (err) {
+        console.warn("No se pudo inicializar Live2D WebGL:", err);
+      }
+    }
+
+    function triggerValeriaTapMotion() {
+      if (live2dModel) {
+        live2dModel.motion("TapBody");
+      }
+    }
+
+    // --- SELECCIÓN DE VOZ FEMENINA EN ESPAÑOL ---
+    function loadFemaleSpanishVoice() {
+      if (!("speechSynthesis" in window)) return null;
+      availableVoices = window.speechSynthesis.getVoices();
+      const spanishVoices = availableVoices.filter((v) => v.lang.toLowerCase().startsWith("es"));
+
+      // Prioriza voces femeninas explícitas y descarta voces masculinas conocidas (Jorge, Pablo, Raul, Diego, Carlos, etc.)
+      const femaleRegex = /sabina|helena|dalia|paulina|monica|laura|elena|lucia|sofia|carmen|paloma|female|woman|google español|natural/i;
+      const maleRegex = /jorge|pablo|raul|diego|carlos|alvaro|tomas|juan|male|man|espeak/i;
+
+      const bestFemale = spanishVoices.find((v) => femaleRegex.test(v.name) && !maleRegex.test(v.name))
+        || spanishVoices.find((v) => !maleRegex.test(v.name))
+        || spanishVoices[0]
+        || null;
+
+      return bestFemale;
+    }
+
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        availableVoices = window.speechSynthesis.getVoices();
+      };
     }
 
     function speakAsValeria(text) {
+      triggerValeriaTapMotion();
+
       if (!valeriaVoiceEnabled || !("speechSynthesis" in window)) {
-        setValeriaSpeaking(true);
-        setTimeout(() => setValeriaSpeaking(false), Math.min(4500, text.length * 45));
+        isValeriaSpeaking = true;
+        setTimeout(() => { isValeriaSpeaking = false; }, Math.min(5000, text.length * 48));
         return;
       }
+
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = "es-ES";
-      utterance.rate = 1.03;
-      utterance.pitch = 1.08;
 
-      const voices = window.speechSynthesis.getVoices();
-      const spanishFemale = voices.find((v) => v.lang.startsWith("es") && /female|paulina|monica|helena|sabina|laura|google español/i.test(v.name))
-        || voices.find((v) => v.lang.startsWith("es"));
-      if (spanishFemale) utterance.voice = spanishFemale;
+      const chosenVoice = loadFemaleSpanishVoice();
+      if (chosenVoice) {
+        utterance.voice = chosenVoice;
+        // Si el sistema solo tiene un sintetizador genérico (como espeak en Linux), elevamos el tono para timbre femenino claro
+        const isGenericLinux = /espeak|default/i.test(chosenVoice.name);
+        utterance.pitch = isGenericLinux ? 1.45 : 1.16;
+        utterance.rate = isGenericLinux ? 1.05 : 1.02;
+      } else {
+        utterance.pitch = 1.35;
+        utterance.rate = 1.03;
+      }
 
-      utterance.onstart = () => setValeriaSpeaking(true);
-      utterance.onend = () => setValeriaSpeaking(false);
-      utterance.onerror = () => setValeriaSpeaking(false);
+      utterance.onstart = () => { isValeriaSpeaking = true; };
+      utterance.onend = () => { isValeriaSpeaking = false; };
+      utterance.onerror = () => { isValeriaSpeaking = false; };
       window.speechSynthesis.speak(utterance);
     }
 
@@ -1154,7 +1173,7 @@
       if (iconUse) iconUse.setAttribute("href", valeriaVoiceEnabled ? "#icon-volume" : "#icon-mute");
       if (!valeriaVoiceEnabled && "speechSynthesis" in window) {
         window.speechSynthesis.cancel();
-        setValeriaSpeaking(false);
+        isValeriaSpeaking = false;
       }
     }
 
@@ -1176,7 +1195,7 @@
     }
 
     function valeriaRepeatWelcome() {
-      const msg = "Hola, bienvenido a Haka. Soy Valeria, de Gestión Humana. Estamos buscando a nuestro próximo Gestor de Experiencia Corporativa para liderar el bienestar y la cultura de nuestra planta y oficinas. Puedes revisar la ficha del puesto o iniciar tu postulación aquí mismo.";
+      const msg = "Hola, bienvenido a Haka. Soy Valeria, de Gestión Humana. Estamos buscando a nuestro próximo Gestor de Experiencia Corporativa para impulsar el bienestar y la cultura de nuestra planta y oficinas. Puedes revisar la ficha del puesto o iniciar tu postulación aquí mismo.";
       speakAsValeria(msg);
     }
 
@@ -1199,12 +1218,11 @@
 
       const systemContext = `
 Eres Valeria, anfitriona corporativa y especialista de Experiencia del Colaborador en Haka (empresa de alimentos derivados lácteos).
-Responde de forma cálida, profesional, breve (máximo 3 oraciones) y directa en español.
+Responde de forma cálida, femenina, profesional y breve (máximo 3 oraciones) en español.
 Información de la empresa y vacante:
 - Empresa: Haka, dedicada a derivados lácteos con estándares ISO/BPM y enfoque en bienestar humano.
 - Vacante abierta: Gestor de Experiencia Corporativa (Employee Experience Manager), reporta a Dirección de Gestión Humana.
 - Competencias evaluadas: Análisis Data-Driven (eNPS, clima, rotación, ausentismo - 30%), Empatía Estructurada y contención emocional (25%), Visión Sistémica (25%), Liderazgo de Influencia (20%).
-- Proceso: Formulario de 6 pasos con 2 casos situacionales técnicos, revisión por comité y entrevista.
 Consulta del usuario: ${question}
 `;
 
@@ -1230,7 +1248,6 @@ Consulta del usuario: ${question}
       }
     }
 
-    // Dispara la bienvenida hablada de Valeria en la primera interacción con la página (requerido por navegadores modernos para audio)
     window.addEventListener("pointerdown", () => {
       if (!valeriaWelcomed) {
         valeriaWelcomed = true;
@@ -1705,6 +1722,7 @@ Postulantes: ${JSON.stringify(listToEvaluate)}
     }
 
     initSupabase();
+    initValeriaLive2D();
     setupDraftAutosave();
     updateStepUI();
     toggleExperienceFields();
